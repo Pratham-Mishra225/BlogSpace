@@ -1,7 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { BookOpen, Compass, Search as SearchIcon, UserPlus } from "lucide-react";
+import { BookOpen, Search as SearchIcon, UserPlus } from "lucide-react";
 import { PageTransition } from "@/components/PageTransition";
 import { FeedToggle } from "@/components/FeedToggle";
 import { PostCard } from "@/components/PostCard";
@@ -110,9 +109,6 @@ function HomePage() {
         )}
       </section>
 
-      {!loading && !error && filtered.length === 0 && false && (
-        <Compass className="hidden" />
-      )}
     </PageTransition>
   );
 }
