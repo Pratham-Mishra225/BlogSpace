@@ -1,0 +1,65 @@
+import { motion } from "framer-motion";
+import { Link } from "@tanstack/react-router";
+import type { Post } from "@/types";
+import { formatDate, truncate } from "@/lib/format";
+
+interface Props {
+  post: Post;
+}
+
+export function PostCard({ post }: Props) {
+  return (
+    <motion.article
+      whileHover={{ y: -4, scale: 1.01 }}
+      transition={{ type: "spring", stiffness: 260, damping: 22 }}
+      className="group relative overflow-hidden rounded-lg border border-border bg-card shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
+    >
+      <Link
+        to="/post/$id"
+        params={{ id: post.id }}
+        className="block"
+        aria-label={post.title}
+      >
+        <div className="aspect-[16/10] overflow-hidden bg-muted">
+          <img
+            src={post.coverImage}
+            alt=""
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        </div>
+        <div className="flex flex-col gap-3 p-6">
+          <div className="flex flex-wrap gap-2">
+            {post.tags.slice(0, 2).map((t) => (
+              <span
+                key={t}
+                className="rounded-full bg-muted px-2.5 py-0.5 text-xs uppercase tracking-wider text-muted-foreground"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+          <h2 className="font-serif text-2xl leading-tight text-foreground">
+            {post.title}
+          </h2>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {truncate(post.content, 140)}
+          </p>
+          <div className="mt-2 flex items-center gap-3 border-t border-border pt-4">
+            <img
+              src={post.author.avatar}
+              alt={post.author.name}
+              className="h-8 w-8 rounded-full object-cover"
+            />
+            <div className="flex-1 text-xs text-muted-foreground">
+              <div className="font-medium text-foreground">{post.author.name}</div>
+              <div>
+                {formatDate(post.createdAt)} · {post.readingTime} min read
+              </div>
+            </div>
+          </div>
+        </div>
+      </Link>
+    </motion.article>
+  );
+}
