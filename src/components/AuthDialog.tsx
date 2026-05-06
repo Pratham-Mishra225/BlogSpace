@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 interface Props {
@@ -20,6 +21,7 @@ interface Props {
 
 export function AuthDialog({ open, onOpenChange }: Props) {
   const { login, signup } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
@@ -28,12 +30,17 @@ export function AuthDialog({ open, onOpenChange }: Props) {
     e.preventDefault();
     setPending(true);
     try {
-      if (mode === "login") await login({ email, password });
-      else await signup({ email, password });
+      const user =
+        mode === "login"
+          ? await login({ email, password })
+          : await signup({ email, password });
       toast.success(mode === "login" ? "Welcome back" : "Welcome to BlogSpace");
       onOpenChange(false);
       setEmail("");
       setPassword("");
+      if (!user.isProfileComplete) {
+        navigate({ to: "/onboarding" });
+      }
     } catch (err) {
       toast.error((err as Error).message);
     } finally {

@@ -9,11 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as EditorRouteImport } from './routes/editor'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProfileIdRouteImport } from './routes/profile.$id'
 import { Route as PostIdRouteImport } from './routes/post.$id'
 
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EditorRoute = EditorRouteImport.update({
   id: '/editor',
   path: '/editor',
@@ -38,12 +44,14 @@ const PostIdRoute = PostIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/editor': typeof EditorRoute
+  '/onboarding': typeof OnboardingRoute
   '/post/$id': typeof PostIdRoute
   '/profile/$id': typeof ProfileIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/editor': typeof EditorRoute
+  '/onboarding': typeof OnboardingRoute
   '/post/$id': typeof PostIdRoute
   '/profile/$id': typeof ProfileIdRoute
 }
@@ -51,26 +59,41 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/editor': typeof EditorRoute
+  '/onboarding': typeof OnboardingRoute
   '/post/$id': typeof PostIdRoute
   '/profile/$id': typeof ProfileIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/editor' | '/post/$id' | '/profile/$id'
+  fullPaths: '/' | '/editor' | '/onboarding' | '/post/$id' | '/profile/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/editor' | '/post/$id' | '/profile/$id'
-  id: '__root__' | '/' | '/editor' | '/post/$id' | '/profile/$id'
+  to: '/' | '/editor' | '/onboarding' | '/post/$id' | '/profile/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/editor'
+    | '/onboarding'
+    | '/post/$id'
+    | '/profile/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EditorRoute: typeof EditorRoute
+  OnboardingRoute: typeof OnboardingRoute
   PostIdRoute: typeof PostIdRoute
   ProfileIdRoute: typeof ProfileIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/editor': {
       id: '/editor'
       path: '/editor'
@@ -105,6 +128,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EditorRoute: EditorRoute,
+  OnboardingRoute: OnboardingRoute,
   PostIdRoute: PostIdRoute,
   ProfileIdRoute: ProfileIdRoute,
 }

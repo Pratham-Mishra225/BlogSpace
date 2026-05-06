@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { RichTextEditor } from "@/components/RichTextEditor";
 import { createPost } from "@/services/api";
 import type { CreatePostDTO } from "@/types";
 import { toast } from "sonner";
@@ -18,10 +19,11 @@ export function EditorForm({ disabled }: Props) {
   const [content, setContent] = useState("");
   const [pending, setPending] = useState(false);
 
-  const submit = async (e: FormEvent, draft: boolean) => {
+  const submit = async (e: FormEvent | React.MouseEvent, draft: boolean) => {
     e.preventDefault();
     if (disabled) return;
-    if (!title.trim() || !content.trim()) {
+    const isEmpty = !content.replace(/<[^>]+>/g, "").trim();
+    if (!title.trim() || isEmpty) {
       toast.error("Add a title and some content first.");
       return;
     }
@@ -29,6 +31,7 @@ export function EditorForm({ disabled }: Props) {
     const dto: CreatePostDTO = {
       title,
       content,
+      format: "html",
       coverImage: coverImage || undefined,
       tags: tags
         .split(",")
@@ -53,6 +56,7 @@ export function EditorForm({ disabled }: Props) {
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Title"
         disabled={disabled}
+        maxLength={140}
         className="w-full bg-transparent font-serif text-4xl leading-tight text-foreground placeholder:text-muted-foreground/60 focus:outline-none sm:text-5xl"
       />
 
@@ -71,14 +75,7 @@ export function EditorForm({ disabled }: Props) {
         />
       </div>
 
-      <textarea
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        placeholder="Tell your story… Markdown supported."
-        disabled={disabled}
-        rows={18}
-        className="w-full resize-y bg-transparent font-mono text-base leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
-      />
+      <RichTextEditor value={content} onChange={setContent} disabled={disabled} />
 
       <div className="glass fixed inset-x-0 bottom-0 z-30 border-t border-border">
         <div className="mx-auto flex max-w-3xl items-center justify-end gap-3 px-6 py-3">

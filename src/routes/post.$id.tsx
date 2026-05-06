@@ -7,6 +7,8 @@ import { formatDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { AuthDialog } from "@/components/AuthDialog";
+import { LikeButton } from "@/components/LikeButton";
+import { ShareMenu } from "@/components/ShareMenu";
 
 export const Route = createFileRoute("/post/$id")({
   component: PostPage,
@@ -93,7 +95,17 @@ function PostPage() {
         )}
 
         <div className="mt-12">
-          <MarkdownRenderer source={data.content} />
+          <MarkdownRenderer source={data.content} format={data.format} />
+        </div>
+
+        <div className="mt-10 flex items-center justify-between border-t border-border pt-6">
+          <LikeButton
+            postId={data.id}
+            initialLiked={data.isLiked}
+            initialCount={data.likeCount}
+            onAuthRequired={() => setAuthOpen(true)}
+          />
+          <ShareMenu postId={data.id} title={data.title} />
         </div>
 
         <AuthorBio author={data.author} onAuthRequired={() => setAuthOpen(true)} />
