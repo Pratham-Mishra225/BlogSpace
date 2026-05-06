@@ -2,12 +2,17 @@ import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import type { Post } from "@/types";
 import { formatDate, truncate } from "@/lib/format";
+import { LikeButton } from "@/components/LikeButton";
+import { ShareMenu } from "@/components/ShareMenu";
 
 interface Props {
   post: Post;
 }
 
+const stripHtml = (s: string) => s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+
 export function PostCard({ post }: Props) {
+  const excerpt = post.format === "html" ? stripHtml(post.content) : post.content;
   return (
     <motion.article
       whileHover={{ y: -4, scale: 1.01 }}
@@ -43,7 +48,7 @@ export function PostCard({ post }: Props) {
             {post.title}
           </h2>
           <p className="text-sm leading-relaxed text-muted-foreground">
-            {truncate(post.content, 140)}
+            {truncate(excerpt, 140)}
           </p>
           <div className="mt-2 flex items-center gap-3 border-t border-border pt-4">
             <img
@@ -60,6 +65,15 @@ export function PostCard({ post }: Props) {
           </div>
         </div>
       </Link>
+      <div className="flex items-center justify-between border-t border-border px-3 py-2">
+        <LikeButton
+          postId={post.id}
+          initialLiked={post.isLiked}
+          initialCount={post.likeCount}
+          size="sm"
+        />
+        <ShareMenu postId={post.id} title={post.title} size="sm" />
+      </div>
     </motion.article>
   );
 }
