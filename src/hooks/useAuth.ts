@@ -5,5 +5,14 @@ export const useAuth = () => {
   const login = useAuthStore((s) => s.login);
   const signup = useAuthStore((s) => s.signup);
   const logout = useAuthStore((s) => s.logout);
-  return { user, isAuthenticated: !!user, login, signup, logout };
+  const saveProfile = useAuthStore((s) => s.saveProfile);
+  return {
+    user,
+    isAuthenticated: !!user,
+    isProfileComplete: !!user?.isProfileComplete,
+    login,
+    signup,
+    logout,
+    saveProfile,
+  };
 };
