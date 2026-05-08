@@ -19,9 +19,11 @@ export interface Post {
   author: User;
   tags: string[];
   createdAt: string;
+  updatedAt: string;
   readingTime: number;
   likeCount: number;
   isLiked: boolean;
+  status: PostStatus;
 }
 
 export interface Profile {
