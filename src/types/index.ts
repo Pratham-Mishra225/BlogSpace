@@ -1,4 +1,5 @@
 export type ContentFormat = "html" | "markdown";
+export type PostStatus = "draft" | "published";
 
 export interface User {
   id: string;
