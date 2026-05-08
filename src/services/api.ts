@@ -103,6 +103,8 @@ const posts: Post[] = [
     readingTime: 6,
     likeCount: 124,
     isLiked: false,
+    status: "published",
+    updatedAt: "2026-04-22T09:00:00.000Z",
   },
   {
     id: "p2",
@@ -116,6 +118,8 @@ const posts: Post[] = [
     readingTime: 9,
     likeCount: 88,
     isLiked: false,
+    status: "published",
+    updatedAt: "2026-04-19T14:30:00.000Z",
   },
   {
     id: "p3",
@@ -129,6 +133,8 @@ const posts: Post[] = [
     readingTime: 5,
     likeCount: 212,
     isLiked: false,
+    status: "published",
+    updatedAt: "2026-04-15T08:10:00.000Z",
   },
   {
     id: "p4",
@@ -142,6 +148,8 @@ const posts: Post[] = [
     readingTime: 7,
     likeCount: 47,
     isLiked: false,
+    status: "published",
+    updatedAt: "2026-04-10T18:00:00.000Z",
   },
   {
     id: "p5",
@@ -155,6 +163,8 @@ const posts: Post[] = [
     readingTime: 4,
     likeCount: 63,
     isLiked: false,
+    status: "published",
+    updatedAt: "2026-04-05T07:45:00.000Z",
   },
   {
     id: "p6",
@@ -168,6 +178,8 @@ const posts: Post[] = [
     readingTime: 6,
     likeCount: 154,
     isLiked: false,
+    status: "published",
+    updatedAt: "2026-03-28T11:20:00.000Z",
   },
   {
     id: "p7",
@@ -181,6 +193,8 @@ const posts: Post[] = [
     readingTime: 5,
     likeCount: 91,
     isLiked: false,
+    status: "published",
+    updatedAt: "2026-03-22T16:00:00.000Z",
   },
   {
     id: "p8",
@@ -194,6 +208,8 @@ const posts: Post[] = [
     readingTime: 8,
     likeCount: 38,
     isLiked: false,
+    status: "published",
+    updatedAt: "2026-03-14T09:00:00.000Z",
   },
 ];
 
