@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { PageTransition } from "@/components/PageTransition";
 import { MarkdownRenderer } from "@/lib/markdown";
 import { AuthorBio } from "@/components/AuthorBio";
@@ -9,6 +9,8 @@ import { useState } from "react";
 import { AuthDialog } from "@/components/AuthDialog";
 import { LikeButton } from "@/components/LikeButton";
 import { ShareMenu } from "@/components/ShareMenu";
+import { DeletePostButton } from "@/components/DeletePostButton";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/post/$id")({
   component: PostPage,
