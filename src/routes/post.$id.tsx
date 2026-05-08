@@ -110,7 +110,17 @@ function PostPage() {
             initialCount={data.likeCount}
             onAuthRequired={() => setAuthOpen(true)}
           />
-          <ShareMenu postId={data.id} title={data.title} />
+          <div className="flex items-center gap-1">
+            <ShareMenu postId={data.id} title={data.title} />
+            {isOwner && (
+              <DeletePostButton
+                postId={data.id}
+                onDeleted={() =>
+                  navigate({ to: "/profile/$id", params: { id: data.author.id } })
+                }
+              />
+            )}
+          </div>
         </div>
 
         <AuthorBio author={data.author} onAuthRequired={() => setAuthOpen(true)} />
