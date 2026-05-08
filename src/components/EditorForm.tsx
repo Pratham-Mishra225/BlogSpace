@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/RichTextEditor";
-import { createPost } from "@/services/api";
+import { createPost, saveDraft } from "@/services/api";
 import type { CreatePostDTO } from "@/types";
 import { toast } from "sonner";
 
