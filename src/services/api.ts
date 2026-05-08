@@ -231,9 +231,12 @@ const decoratePost = (p: Post): Post => ({
 });
 
 // ---- POSTS ----
+const isPublished = (p: Post) => p.status === "published";
+
 export const getPosts = (): Promise<Post[]> =>
   delay(
     [...posts]
+      .filter(isPublished)
       .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
       .map(decoratePost),
   );
@@ -245,6 +248,7 @@ export const getFollowingPosts = (): Promise<Post[]> => {
     .map((f) => f.followingId);
   return delay(
     posts
+      .filter(isPublished)
       .filter((p) => followingIds.includes(p.author.id))
       .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
       .map(decoratePost),
@@ -254,12 +258,27 @@ export const getFollowingPosts = (): Promise<Post[]> => {
 export const getPostById = (id: string): Promise<Post> => {
   const post = posts.find((p) => p.id === id);
   if (!post) return Promise.reject(new Error("Post not found"));
+  // Drafts are only visible to their author
+  if (post.status === "draft" && post.author.id !== currentUserId) {
+    return Promise.reject(new Error("Post not found"));
+  }
   return delay(decoratePost(post));
 };
 
-export const createPost = (data: CreatePostDTO): Promise<Post> => {
+export const getDraftPosts = (): Promise<Post[]> => {
+  if (!currentUserId) return delay([]);
+  return delay(
+    posts
+      .filter((p) => p.status === "draft" && p.author.id === currentUserId)
+      .sort((a, b) => +new Date(b.updatedAt) - +new Date(a.updatedAt))
+      .map(decoratePost),
+  );
+};
+
+const buildPost = (data: CreatePostDTO, status: PostStatus): Post => {
   const author = users.find((u) => u.id === currentUserId) ?? users[0];
-  const newPost: Post = {
+  const now = new Date().toISOString();
+  return {
     id: `p${Date.now()}`,
     title: data.title.trim() || "Untitled",
     content: data.content,
@@ -269,11 +288,23 @@ export const createPost = (data: CreatePostDTO): Promise<Post> => {
       "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&q=80",
     author,
     tags: data.tags.filter(Boolean),
-    createdAt: new Date().toISOString(),
+    createdAt: now,
+    updatedAt: now,
     readingTime: computeReadingTime(data.content),
     likeCount: 0,
     isLiked: false,
+    status,
   };
+};
+
+export const createPost = (data: CreatePostDTO): Promise<Post> => {
+  const newPost = buildPost(data, "published");
+  posts.unshift(newPost);
+  return delay(newPost);
+};
+
+export const saveDraft = (data: CreatePostDTO): Promise<Post> => {
+  const newPost = buildPost(data, "draft");
   posts.unshift(newPost);
   return delay(newPost);
 };
