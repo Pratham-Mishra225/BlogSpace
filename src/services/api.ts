@@ -2,6 +2,7 @@ import type {
   AuthDTO,
   CreatePostDTO,
   Post,
+  PostStatus,
   Profile,
   ProfileSetupDTO,
   UpdatePostDTO,
