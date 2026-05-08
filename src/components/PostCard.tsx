@@ -4,14 +4,17 @@ import type { Post } from "@/types";
 import { formatDate, truncate } from "@/lib/format";
 import { LikeButton } from "@/components/LikeButton";
 import { ShareMenu } from "@/components/ShareMenu";
+import { DeletePostButton } from "@/components/DeletePostButton";
 
 interface Props {
   post: Post;
+  canDelete?: boolean;
+  onDeleted?: () => void;
 }
 
 const stripHtml = (s: string) => s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
-export function PostCard({ post }: Props) {
+export function PostCard({ post, canDelete, onDeleted }: Props) {
   const excerpt = post.format === "html" ? stripHtml(post.content) : post.content;
   return (
     <motion.article
@@ -72,7 +75,10 @@ export function PostCard({ post }: Props) {
           initialCount={post.likeCount}
           size="sm"
         />
-        <ShareMenu postId={post.id} title={post.title} size="sm" />
+        <div className="flex items-center gap-1">
+          <ShareMenu postId={post.id} title={post.title} size="sm" />
+          {canDelete && <DeletePostButton postId={post.id} onDeleted={onDeleted} />}
+        </div>
       </div>
     </motion.article>
   );

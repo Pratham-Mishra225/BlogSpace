@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { PageTransition } from "@/components/PageTransition";
 import { MarkdownRenderer } from "@/lib/markdown";
 import { AuthorBio } from "@/components/AuthorBio";
@@ -9,6 +9,8 @@ import { useState } from "react";
 import { AuthDialog } from "@/components/AuthDialog";
 import { LikeButton } from "@/components/LikeButton";
 import { ShareMenu } from "@/components/ShareMenu";
+import { DeletePostButton } from "@/components/DeletePostButton";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/post/$id")({
   component: PostPage,
@@ -18,6 +20,9 @@ function PostPage() {
   const { id } = Route.useParams();
   const { data, loading, error, refetch } = usePost(id);
   const [authOpen, setAuthOpen] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const isOwner = !!user && !!data && user.id === data.author.id;
 
   if (loading) {
     return (
@@ -105,7 +110,17 @@ function PostPage() {
             initialCount={data.likeCount}
             onAuthRequired={() => setAuthOpen(true)}
           />
-          <ShareMenu postId={data.id} title={data.title} />
+          <div className="flex items-center gap-1">
+            <ShareMenu postId={data.id} title={data.title} />
+            {isOwner && (
+              <DeletePostButton
+                postId={data.id}
+                onDeleted={() =>
+                  navigate({ to: "/profile/$id", params: { id: data.author.id } })
+                }
+              />
+            )}
+          </div>
         </div>
 
         <AuthorBio author={data.author} onAuthRequired={() => setAuthOpen(true)} />

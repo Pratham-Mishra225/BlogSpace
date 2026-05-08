@@ -2,6 +2,7 @@ import type {
   AuthDTO,
   CreatePostDTO,
   Post,
+  PostStatus,
   Profile,
   ProfileSetupDTO,
   UpdatePostDTO,
@@ -103,6 +104,8 @@ const posts: Post[] = [
     readingTime: 6,
     likeCount: 124,
     isLiked: false,
+    status: "published",
+    updatedAt: "2026-04-22T09:00:00.000Z",
   },
   {
     id: "p2",
@@ -116,6 +119,8 @@ const posts: Post[] = [
     readingTime: 9,
     likeCount: 88,
     isLiked: false,
+    status: "published",
+    updatedAt: "2026-04-19T14:30:00.000Z",
   },
   {
     id: "p3",
@@ -129,6 +134,8 @@ const posts: Post[] = [
     readingTime: 5,
     likeCount: 212,
     isLiked: false,
+    status: "published",
+    updatedAt: "2026-04-15T08:10:00.000Z",
   },
   {
     id: "p4",
@@ -142,6 +149,8 @@ const posts: Post[] = [
     readingTime: 7,
     likeCount: 47,
     isLiked: false,
+    status: "published",
+    updatedAt: "2026-04-10T18:00:00.000Z",
   },
   {
     id: "p5",
@@ -155,6 +164,8 @@ const posts: Post[] = [
     readingTime: 4,
     likeCount: 63,
     isLiked: false,
+    status: "published",
+    updatedAt: "2026-04-05T07:45:00.000Z",
   },
   {
     id: "p6",
@@ -168,6 +179,8 @@ const posts: Post[] = [
     readingTime: 6,
     likeCount: 154,
     isLiked: false,
+    status: "published",
+    updatedAt: "2026-03-28T11:20:00.000Z",
   },
   {
     id: "p7",
@@ -181,6 +194,8 @@ const posts: Post[] = [
     readingTime: 5,
     likeCount: 91,
     isLiked: false,
+    status: "published",
+    updatedAt: "2026-03-22T16:00:00.000Z",
   },
   {
     id: "p8",
@@ -194,6 +209,8 @@ const posts: Post[] = [
     readingTime: 8,
     likeCount: 38,
     isLiked: false,
+    status: "published",
+    updatedAt: "2026-03-14T09:00:00.000Z",
   },
 ];
 
@@ -215,9 +232,12 @@ const decoratePost = (p: Post): Post => ({
 });
 
 // ---- POSTS ----
+const isPublished = (p: Post) => p.status === "published";
+
 export const getPosts = (): Promise<Post[]> =>
   delay(
     [...posts]
+      .filter(isPublished)
       .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
       .map(decoratePost),
   );
@@ -229,6 +249,7 @@ export const getFollowingPosts = (): Promise<Post[]> => {
     .map((f) => f.followingId);
   return delay(
     posts
+      .filter(isPublished)
       .filter((p) => followingIds.includes(p.author.id))
       .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
       .map(decoratePost),
@@ -238,12 +259,27 @@ export const getFollowingPosts = (): Promise<Post[]> => {
 export const getPostById = (id: string): Promise<Post> => {
   const post = posts.find((p) => p.id === id);
   if (!post) return Promise.reject(new Error("Post not found"));
+  // Drafts are only visible to their author
+  if (post.status === "draft" && post.author.id !== currentUserId) {
+    return Promise.reject(new Error("Post not found"));
+  }
   return delay(decoratePost(post));
 };
 
-export const createPost = (data: CreatePostDTO): Promise<Post> => {
+export const getDraftPosts = (): Promise<Post[]> => {
+  if (!currentUserId) return delay([]);
+  return delay(
+    posts
+      .filter((p) => p.status === "draft" && p.author.id === currentUserId)
+      .sort((a, b) => +new Date(b.updatedAt) - +new Date(a.updatedAt))
+      .map(decoratePost),
+  );
+};
+
+const buildPost = (data: CreatePostDTO, status: PostStatus): Post => {
   const author = users.find((u) => u.id === currentUserId) ?? users[0];
-  const newPost: Post = {
+  const now = new Date().toISOString();
+  return {
     id: `p${Date.now()}`,
     title: data.title.trim() || "Untitled",
     content: data.content,
@@ -253,11 +289,23 @@ export const createPost = (data: CreatePostDTO): Promise<Post> => {
       "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&q=80",
     author,
     tags: data.tags.filter(Boolean),
-    createdAt: new Date().toISOString(),
+    createdAt: now,
+    updatedAt: now,
     readingTime: computeReadingTime(data.content),
     likeCount: 0,
     isLiked: false,
+    status,
   };
+};
+
+export const createPost = (data: CreatePostDTO): Promise<Post> => {
+  const newPost = buildPost(data, "published");
+  posts.unshift(newPost);
+  return delay(newPost);
+};
+
+export const saveDraft = (data: CreatePostDTO): Promise<Post> => {
+  const newPost = buildPost(data, "draft");
   posts.unshift(newPost);
   return delay(newPost);
 };
@@ -350,7 +398,7 @@ export const getProfile = (id: string): Promise<Profile> => {
   const user = users.find((u) => u.id === id);
   if (!user) return Promise.reject(new Error("User not found"));
   const userPosts = posts
-    .filter((p) => p.author.id === id)
+    .filter((p) => p.author.id === id && p.status === "published")
     .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
     .map(decoratePost);
   const followersCount = follows.filter((f) => f.followingId === id).length;
