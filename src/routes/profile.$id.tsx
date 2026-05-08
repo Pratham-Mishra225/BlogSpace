@@ -1,14 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { FileText } from "lucide-react";
+import { FileText, FilePen } from "lucide-react";
 import { PageTransition } from "@/components/PageTransition";
 import { PostCard } from "@/components/PostCard";
+import { DraftCard } from "@/components/DraftCard";
 import { FollowButton } from "@/components/FollowButton";
 import { EmptyState } from "@/components/EmptyState";
 import { AuthDialog } from "@/components/AuthDialog";
 import { useProfile } from "@/hooks/useProfile";
+import { useDrafts } from "@/hooks/usePosts";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/profile/$id")({
   component: ProfilePage,
@@ -20,6 +23,7 @@ function ProfilePage() {
   const { user } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
   const isMe = user?.id === id;
+  const drafts = useDrafts();
 
   if (loading) {
     return (
@@ -46,6 +50,37 @@ function ProfilePage() {
       </div>
     );
   }
+
+  const handlePostDeleted = () => {
+    void refetch();
+  };
+  const handleDraftDeleted = () => {
+    void drafts.refetch();
+  };
+
+  const publishedGrid =
+    data.posts.length === 0 ? (
+      <EmptyState
+        icon={FileText}
+        title={isMe ? "You haven't published yet" : `${data.user.name} hasn't published yet`}
+        description={
+          isMe
+            ? "Share your first story to see it appear here."
+            : "When they share their first story, it will appear here."
+        }
+      />
+    ) : (
+      <div className="grid gap-8 sm:grid-cols-2">
+        {data.posts.map((p) => (
+          <PostCard
+            key={p.id}
+            post={p}
+            canDelete={isMe}
+            onDeleted={handlePostDeleted}
+          />
+        ))}
+      </div>
+    );
 
   return (
     <PageTransition>
@@ -92,18 +127,38 @@ function ProfilePage() {
       </section>
 
       <section className="mx-auto max-w-5xl px-6 py-12">
-        {data.posts.length === 0 ? (
-          <EmptyState
-            icon={FileText}
-            title={`${data.user.name} hasn't published yet`}
-            description="When they share their first story, it will appear here."
-          />
+        {isMe ? (
+          <Tabs defaultValue="published" className="w-full">
+            <TabsList className="mb-8">
+              <TabsTrigger value="published">Published</TabsTrigger>
+              <TabsTrigger value="drafts">
+                Drafts{drafts.data ? ` (${drafts.data.length})` : ""}
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="published">{publishedGrid}</TabsContent>
+            <TabsContent value="drafts">
+              {drafts.loading ? (
+                <div className="space-y-3">
+                  <div className="h-24 w-full animate-pulse rounded-lg bg-muted" />
+                  <div className="h-24 w-full animate-pulse rounded-lg bg-muted" />
+                </div>
+              ) : !drafts.data || drafts.data.length === 0 ? (
+                <EmptyState
+                  icon={FilePen}
+                  title="No drafts yet"
+                  description="Drafts you save while writing will appear here, visible only to you."
+                />
+              ) : (
+                <div className="grid gap-4">
+                  {drafts.data.map((p) => (
+                    <DraftCard key={p.id} post={p} onDeleted={handleDraftDeleted} />
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         ) : (
-          <div className="grid gap-8 sm:grid-cols-2">
-            {data.posts.map((p) => (
-              <PostCard key={p.id} post={p} />
-            ))}
-          </div>
+          publishedGrid
         )}
       </section>
       <AuthDialog open={authOpen} onOpenChange={setAuthOpen} />
