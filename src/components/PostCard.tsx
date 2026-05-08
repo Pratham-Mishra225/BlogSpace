@@ -75,7 +75,10 @@ export function PostCard({ post, canDelete, onDeleted }: Props) {
           initialCount={post.likeCount}
           size="sm"
         />
-        <ShareMenu postId={post.id} title={post.title} size="sm" />
+        <div className="flex items-center gap-1">
+          <ShareMenu postId={post.id} title={post.title} size="sm" />
+          {canDelete && <DeletePostButton postId={post.id} onDeleted={onDeleted} />}
+        </div>
       </div>
     </motion.article>
   );
