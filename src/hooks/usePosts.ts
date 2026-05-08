@@ -55,3 +55,27 @@ export function usePost(id: string) {
 
   return { ...state, refetch: load };
 }
+
+export function useDrafts() {
+  const [state, setState] = useState<State<Post[]>>({
+    data: null,
+    loading: true,
+    error: null,
+  });
+
+  const load = useCallback(async () => {
+    setState({ data: null, loading: true, error: null });
+    try {
+      const data = await getDraftPosts();
+      setState({ data, loading: false, error: null });
+    } catch (e) {
+      setState({ data: null, loading: false, error: (e as Error).message });
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return { ...state, refetch: load };
+}
