@@ -20,6 +20,9 @@ function PostPage() {
   const { id } = Route.useParams();
   const { data, loading, error, refetch } = usePost(id);
   const [authOpen, setAuthOpen] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const isOwner = !!user && !!data && user.id === data.author.id;
 
   if (loading) {
     return (
