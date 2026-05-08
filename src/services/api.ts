@@ -398,7 +398,7 @@ export const getProfile = (id: string): Promise<Profile> => {
   const user = users.find((u) => u.id === id);
   if (!user) return Promise.reject(new Error("User not found"));
   const userPosts = posts
-    .filter((p) => p.author.id === id)
+    .filter((p) => p.author.id === id && p.status === "published")
     .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
     .map(decoratePost);
   const followersCount = follows.filter((f) => f.followingId === id).length;
