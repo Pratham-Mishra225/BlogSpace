@@ -4,9 +4,12 @@ import type { Post } from "@/types";
 import { formatDate, truncate } from "@/lib/format";
 import { LikeButton } from "@/components/LikeButton";
 import { ShareMenu } from "@/components/ShareMenu";
+import { DeletePostButton } from "@/components/DeletePostButton";
 
 interface Props {
   post: Post;
+  canDelete?: boolean;
+  onDeleted?: () => void;
 }
 
 const stripHtml = (s: string) => s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
