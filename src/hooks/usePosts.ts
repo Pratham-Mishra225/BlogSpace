@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Post } from "@/types";
-import { getFollowingPosts, getPostById, getPosts } from "@/services/api";
+import { getDraftPosts, getFollowingPosts, getPostById, getPosts } from "@/services/api";
 
 interface State<T> {
   data: T | null;
