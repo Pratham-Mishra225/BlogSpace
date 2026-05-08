@@ -14,7 +14,7 @@ interface Props {
 
 const stripHtml = (s: string) => s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
-export function PostCard({ post }: Props) {
+export function PostCard({ post, canDelete, onDeleted }: Props) {
   const excerpt = post.format === "html" ? stripHtml(post.content) : post.content;
   return (
     <motion.article
