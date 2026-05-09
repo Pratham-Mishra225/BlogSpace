@@ -13,7 +13,7 @@ export const uploadService = {
         { folder, resource_type: "image" },
         (error, result) => {
           if (error) {
-            reject(error);
+            reject(new ApiError(502, "Image upload failed"));
             return;
           }
 

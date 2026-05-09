@@ -45,13 +45,12 @@ const draftSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-draftSchema.pre("save", function setDraftMetadata(next) {
+draftSchema.pre("validate", async function setDraftMetadata() {
   if (this.isModified("content")) {
     this.readingTime = calculateReadingTime(this.content);
   }
 
   this.lastSavedAt = new Date();
-  next();
 });
 
 draftSchema.index({ author: 1, updatedAt: -1 });

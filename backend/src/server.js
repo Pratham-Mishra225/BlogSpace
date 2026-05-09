@@ -1,5 +1,4 @@
 import http from "node:http";
-import mongoose from "mongoose";
 import app from "./app.js";
 import { connectDB, disconnectDB } from "./config/db.js";
 import { env } from "./config/env.js";
@@ -17,8 +16,16 @@ const startServer = async () => {
 const shutdown = async (signal) => {
   console.log(`${signal} received. Shutting down BlogSpace API...`);
 
+  // Force-exit after 10 s so lingering keep-alive connections never block shutdown.
+  const forceExit = setTimeout(() => {
+    console.warn("Graceful shutdown timed out — forcing exit.");
+    process.exit(1);
+  }, 10_000);
+  forceExit.unref();
+
   server.close(async () => {
     await disconnectDB();
+    clearTimeout(forceExit);
     process.exit(0);
   });
 };
@@ -36,8 +43,6 @@ process.on("uncaughtException", (error) => {
   process.exit(1);
 });
 
-mongoose.connection.on("disconnected", () => {
-  console.warn("MongoDB disconnected");
-});
+// MongoDB lifecycle events (connect/disconnect/reconnect) are managed in config/db.js.
 
 startServer();

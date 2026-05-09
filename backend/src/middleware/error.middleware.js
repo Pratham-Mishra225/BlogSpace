@@ -21,6 +21,11 @@ export const errorHandler = (error, _req, res, _next) => {
   const statusCode = error.statusCode || 500;
   const message = error.message || "Internal server error";
 
+  // Always log server-side errors; 5xx are unexpected and need visibility in production.
+  if (statusCode >= 500) {
+    console.error(`[${statusCode}] ${message}`, error.stack ?? "");
+  }
+
   res.status(statusCode).json({
     success: false,
     message,

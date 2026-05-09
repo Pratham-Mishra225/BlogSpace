@@ -16,7 +16,9 @@ const app = express();
 const corsOrigins = env.CORS_ORIGIN.split(",").map((origin) => origin.trim());
 
 // Global middleware is defined here so server.js can stay focused on process lifecycle concerns.
-app.use(helmet());
+// Security headers. crossOriginResourcePolicy is set to "cross-origin" so the
+// frontend can load Cloudinary-hosted images without CORP header violations.
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(
   cors({
     origin: corsOrigins.includes("*") ? "*" : corsOrigins,
@@ -26,7 +28,9 @@ app.use(
 app.use(morgan(isProduction ? "combined" : "dev"));
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
-app.use(cookieParser());
+// Pass the JWT secret as the cookie-parser secret so req.signedCookies works
+// when the auth layer sets HttpOnly signed cookies.
+app.use(cookieParser(env.JWT_SECRET));
 
 app.get("/api", (_req, res) => {
   res.status(200).json({

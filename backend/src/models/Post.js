@@ -61,7 +61,7 @@ const postSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-postSchema.pre("validate", function setComputedFields(next) {
+postSchema.pre("validate", async function setComputedFields() {
   if (!this.slug && this.title) {
     this.slug = slugify(this.title);
   }
@@ -69,8 +69,6 @@ postSchema.pre("validate", function setComputedFields(next) {
   if (this.isModified("content")) {
     this.readingTime = calculateReadingTime(this.content);
   }
-
-  next();
 });
 
 postSchema.index({ title: "text", excerpt: "text", content: "text", tags: "text" });

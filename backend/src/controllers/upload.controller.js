@@ -1,7 +1,11 @@
-import { asyncHandler } from "../middleware/error.middleware.js";
+import { asyncHandler, ApiError } from "../middleware/error.middleware.js";
 import { uploadService } from "../services/upload.service.js";
 
 export const uploadImageController = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    throw new ApiError(400, "No file uploaded");
+  }
+
   const result = await uploadService.uploadImage(req.file.buffer);
 
   res.status(201).json({
