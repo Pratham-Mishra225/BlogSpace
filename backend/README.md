@@ -15,7 +15,7 @@ The backend is organized by responsibility so features can grow without crowding
 - `src/utils` contains small shared helpers.
 - `src/validators` contains request schemas.
 
-Authentication routes are intentionally not implemented yet. The files are present as extension points for the next feature pass.
+Authentication uses JWT access tokens, bcrypt password hashing, protected middleware, and Zod request validation.
 
 ## Setup
 
@@ -52,4 +52,18 @@ Response:
   "success": true,
   "message": "BlogSpace API running"
 }
+```
+
+## Authentication
+
+```http
+POST /api/auth/signup
+POST /api/auth/login
+GET /api/auth/me
+```
+
+Signup expects `name`, `username`, `email`, and `password`. Login expects `email` and `password`. Both return an access token and a password-free user object. Send protected requests with:
+
+```http
+Authorization: Bearer <accessToken>
 ```
