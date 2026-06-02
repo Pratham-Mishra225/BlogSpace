@@ -33,6 +33,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-.lovable/
-.lovable/*
-.lovable
+
+
