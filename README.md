@@ -712,4 +712,4 @@ If the frontend runs on a different port, add that origin instead. Multiple orig
 
 ## License
 
-The backend package currently declares `ISC` in `backend/package.json`. The root package does not currently declare a license. Add a repository-level license if this project will be distributed publicly.
+MIT
