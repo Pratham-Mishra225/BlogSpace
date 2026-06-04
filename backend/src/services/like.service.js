@@ -44,10 +44,12 @@ export const likeService = {
     if (!deleted) throw new ApiError(404, "You have not liked this post");
 
     // Decrement but never go below 0.
+    // updatePipeline: true is required by Mongoose when the update argument is
+    // an aggregation pipeline array instead of a plain update object.
     const updated = await Post.findByIdAndUpdate(
       postId,
       [{ $set: { likeCount: { $max: [0, { $subtract: ["$likeCount", 1] }] } } }],
-      { new: true }
+      { new: true, updatePipeline: true }
     ).select("likeCount");
 
     return { likeCount: updated.likeCount, isLiked: false };
