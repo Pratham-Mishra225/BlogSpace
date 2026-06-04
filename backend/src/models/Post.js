@@ -52,6 +52,11 @@ const postSchema = new mongoose.Schema(
       type: Number,
       default: 1,
     },
+    likeCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
     publishedAt: {
       type: Date,
       default: Date.now,
