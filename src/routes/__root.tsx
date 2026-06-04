@@ -1,6 +1,8 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Toaster } from "@/components/ui/sonner";
+import { useAuthStore } from "@/store/useAuthStore";
 
 import appCss from "../styles.css?url";
 
@@ -75,6 +77,13 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  const restoreSession = useAuthStore((s) => s.restoreSession);
+
+  useEffect(() => {
+    void restoreSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />

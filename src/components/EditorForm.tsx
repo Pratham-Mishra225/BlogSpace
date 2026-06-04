@@ -42,7 +42,7 @@ export function EditorForm({ disabled }: Props) {
       const post = draft ? await saveDraft(dto) : await createPost(dto);
       if (draft) {
         toast.success("Draft saved");
-        navigate({ to: "/profile/$id", params: { id: post.author.id } });
+        navigate({ to: "/profile/$id", params: { id: post.author.username ?? post.author.id } });
       } else {
         toast.success("Published");
         navigate({ to: "/post/$id", params: { id: post.id } });

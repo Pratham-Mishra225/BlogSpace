@@ -22,7 +22,8 @@ function ProfilePage() {
   const { data, loading, error, refetch } = useProfile(id);
   const { user } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
-  const isMe = user?.id === id;
+  // id param is now the username; compare against the logged-in user's username.
+  const isMe = !!(user?.username && user.username === id) || user?.id === id;
   const drafts = useDrafts();
 
   if (loading) {
@@ -119,6 +120,7 @@ function ProfilePage() {
             {!isMe && (
               <FollowButton
                 userId={data.user.id}
+                initialFollowing={data.isFollowing ?? false}
                 onAuthRequired={() => setAuthOpen(true)}
               />
             )}

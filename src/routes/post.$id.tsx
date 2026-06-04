@@ -70,7 +70,7 @@ function PostPage() {
         </h1>
 
         <div className="mt-6 flex items-center gap-3 border-b border-border pb-6">
-          <Link to="/profile/$id" params={{ id: data.author.id }}>
+          <Link to="/profile/$id" params={{ id: data.author.username ?? data.author.id }}>
             <img
               src={data.author.avatar}
               alt={data.author.name}
@@ -80,7 +80,7 @@ function PostPage() {
           <div className="text-sm">
             <Link
               to="/profile/$id"
-              params={{ id: data.author.id }}
+              params={{ id: data.author.username ?? data.author.id }}
               className="font-medium text-foreground hover:underline"
             >
               {data.author.name}

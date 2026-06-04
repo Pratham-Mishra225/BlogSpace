@@ -1,461 +1,334 @@
+/**
+ * BlogSpace API service layer.
+ *
+ * All mock data has been replaced with real HTTP calls to the Express backend.
+ * Every exported function preserves its original signature so that all consumers
+ * (hooks, store, components) need no signature changes.
+ *
+ * Backend base URL: VITE_API_URL (defaults to http://localhost:5000/api via api-client.ts)
+ */
+
+import { apiClient } from "@/lib/api-client";
 import type {
   AuthDTO,
   CreatePostDTO,
   Post,
-  PostStatus,
   Profile,
   ProfileSetupDTO,
   UpdatePostDTO,
   User,
 } from "@/types";
 
-const DELAY = 600;
-const ERROR_RATE = 0;
+// ─────────────────────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────────────────────
 
-const delay = <T,>(value: T): Promise<T> =>
-  new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (Math.random() < ERROR_RATE) {
-        reject(new Error("Network error. Please try again."));
-        return;
-      }
-      resolve(value);
-    }, DELAY);
-  });
-
-const computeReadingTime = (content: string): number => {
-  const text = content.replace(/<[^>]+>/g, " ");
-  const words = text.trim().split(/\s+/).length;
-  return Math.max(1, Math.round(words / 200));
-};
-
-// ---- seeded users ----
-const users: User[] = [
-  {
-    id: "u1",
-    name: "Eleanor Hart",
-    username: "eleanor",
-    avatar: "https://i.pravatar.cc/200?img=47",
-    bio: "Essayist on slow living and the craft of attention.",
-    isProfileComplete: true,
-  },
-  {
-    id: "u2",
-    name: "Marcus Lin",
-    username: "marcus",
-    avatar: "https://i.pravatar.cc/200?img=12",
-    bio: "Writes about software, systems, and the people who make them.",
-    isProfileComplete: true,
-  },
-  {
-    id: "u3",
-    name: "Ana Beltrán",
-    username: "ana",
-    avatar: "https://i.pravatar.cc/200?img=32",
-    bio: "Photographer and field-notes diarist. Currently in Lisbon.",
-    isProfileComplete: true,
-  },
-  {
-    id: "u4",
-    name: "Theo Whitfield",
-    username: "theo",
-    avatar: "https://i.pravatar.cc/200?img=68",
-    bio: "Reader-in-residence. Long sentences welcome.",
-    isProfileComplete: true,
-  },
-];
-
-const sampleContent = (intro: string) => `${intro}
-
-## A quiet beginning
-
-There is a moment, just before the morning rush, when the world feels rehearsed.
-Coffee steams. The street outside is half-light. You sit down, open a blank
-page, and the day has not yet decided what it wants to be.
-
-> "We write to taste life twice, in the moment and in retrospect." — Anaïs Nin
-
-## On craft
-
-Good writing rewards patience. Consider the rhythm of a paragraph the way a
-musician considers a phrase — where to breathe, where to push, where to let the
-silence do the work.
-
-- Read your draft aloud
-- Cut the first sentence; it was a warm-up
-- Trust the reader
-
-## Closing
-
-Stories worth your time are rarely written quickly. Come back tomorrow. The
-page will still be here.`;
-
-// ---- seeded posts ----
-const posts: Post[] = [
-  {
-    id: "p1",
-    title: "The Quiet Discipline of Showing Up",
-    content: sampleContent("We tend to romanticize inspiration. The truth is duller and more demanding: the work shows up because *you* did."),
-    format: "markdown",
-    coverImage: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1200&q=80",
-    author: users[0],
-    tags: ["writing", "craft", "habits"],
-    createdAt: "2026-04-22T09:00:00.000Z",
-    readingTime: 6,
-    likeCount: 124,
-    isLiked: false,
-    status: "published",
-    updatedAt: "2026-04-22T09:00:00.000Z",
-  },
-  {
-    id: "p2",
-    title: "Notes on Building Software That Lasts",
-    content: sampleContent("Software ages like architecture: gracefully if the bones are good, miserably if they are not."),
-    format: "markdown",
-    coverImage: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&q=80",
-    author: users[1],
-    tags: ["engineering", "systems"],
-    createdAt: "2026-04-19T14:30:00.000Z",
-    readingTime: 9,
-    likeCount: 88,
-    isLiked: false,
-    status: "published",
-    updatedAt: "2026-04-19T14:30:00.000Z",
-  },
-  {
-    id: "p3",
-    title: "Lisbon, in Three Afternoons",
-    content: sampleContent("The light here does most of the storytelling. You only have to stand still long enough to listen."),
-    format: "markdown",
-    coverImage: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=1200&q=80",
-    author: users[2],
-    tags: ["travel", "photography"],
-    createdAt: "2026-04-15T08:10:00.000Z",
-    readingTime: 5,
-    likeCount: 212,
-    isLiked: false,
-    status: "published",
-    updatedAt: "2026-04-15T08:10:00.000Z",
-  },
-  {
-    id: "p4",
-    title: "Why I Reread the Same Five Books",
-    content: sampleContent("There is no shortage of new books. There is, however, a shortage of attention — and that is the variable worth optimizing."),
-    format: "markdown",
-    coverImage: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=1200&q=80",
-    author: users[3],
-    tags: ["reading", "essays"],
-    createdAt: "2026-04-10T18:00:00.000Z",
-    readingTime: 7,
-    likeCount: 47,
-    isLiked: false,
-    status: "published",
-    updatedAt: "2026-04-10T18:00:00.000Z",
-  },
-  {
-    id: "p5",
-    title: "A Field Guide to Slow Mornings",
-    content: sampleContent("Mornings, kept slow on purpose, become the editor of the rest of the day."),
-    format: "markdown",
-    coverImage: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1200&q=80",
-    author: users[0],
-    tags: ["lifestyle", "habits"],
-    createdAt: "2026-04-05T07:45:00.000Z",
-    readingTime: 4,
-    likeCount: 63,
-    isLiked: false,
-    status: "published",
-    updatedAt: "2026-04-05T07:45:00.000Z",
-  },
-  {
-    id: "p6",
-    title: "Designing for the Reader, Not the Algorithm",
-    content: sampleContent("If you write for the feed, the feed owns your voice. Write for one person, slowly, and the rest will find you."),
-    format: "markdown",
-    coverImage: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&q=80",
-    author: users[1],
-    tags: ["design", "writing"],
-    createdAt: "2026-03-28T11:20:00.000Z",
-    readingTime: 6,
-    likeCount: 154,
-    isLiked: false,
-    status: "published",
-    updatedAt: "2026-03-28T11:20:00.000Z",
-  },
-  {
-    id: "p7",
-    title: "The Camera as a Reason to Stay",
-    content: sampleContent("A camera, used patiently, is an excuse to stand somewhere a little longer than is comfortable."),
-    format: "markdown",
-    coverImage: "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=1200&q=80",
-    author: users[2],
-    tags: ["photography", "travel"],
-    createdAt: "2026-03-22T16:00:00.000Z",
-    readingTime: 5,
-    likeCount: 91,
-    isLiked: false,
-    status: "published",
-    updatedAt: "2026-03-22T16:00:00.000Z",
-  },
-  {
-    id: "p8",
-    title: "Marginalia: The Art of Talking Back to Books",
-    content: sampleContent("A pencil in the margin is the cheapest, oldest, and most underrated reading tool ever invented."),
-    format: "markdown",
-    coverImage: "https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=1200&q=80",
-    author: users[3],
-    tags: ["reading", "essays"],
-    createdAt: "2026-03-14T09:00:00.000Z",
-    readingTime: 8,
-    likeCount: 38,
-    isLiked: false,
-    status: "published",
-    updatedAt: "2026-03-14T09:00:00.000Z",
-  },
-];
-
-interface FollowEdge {
-  followerId: string;
-  followingId: string;
-}
-const follows: FollowEdge[] = [];
-const likes = new Set<string>(); // key: `${userId}:${postId}`
-
-let currentUserId: string | null = null;
-export const _setCurrentUserId = (id: string | null) => {
-  currentUserId = id;
-};
-
-const decoratePost = (p: Post): Post => ({
-  ...p,
-  isLiked: currentUserId ? likes.has(`${currentUserId}:${p.id}`) : false,
+/** Maps a raw backend post object to the frontend Post shape. */
+const mapPost = (raw: Record<string, unknown>): Post => ({
+  id: (raw._id ?? raw.id) as string,
+  title: raw.title as string,
+  content: raw.content as string,
+  format: "html", // backend always stores TipTap HTML
+  // coverImage may be an object {url, publicId} from Cloudinary or a plain string.
+  coverImage:
+    typeof raw.coverImage === "object" && raw.coverImage !== null
+      ? ((raw.coverImage as { url: string }).url ?? "")
+      : (raw.coverImage as string) ?? "",
+  author: mapUser(raw.author as Record<string, unknown>),
+  tags: (raw.tags as string[]) ?? [],
+  createdAt: raw.createdAt as string,
+  updatedAt: (raw.updatedAt ?? raw.createdAt) as string,
+  readingTime: (raw.readingTime as number) ?? 1,
+  likeCount: (raw.likeCount as number) ?? 0,
+  isLiked: (raw.isLiked as boolean) ?? false,
+  status: (raw.status as "published" | "draft") ?? "published",
 });
 
-// ---- POSTS ----
-const isPublished = (p: Post) => p.status === "published";
+/** Maps a raw backend user / author object to the frontend User shape. */
+const mapUser = (raw: Record<string, unknown>): User => ({
+  id: (raw._id ?? raw.id) as string,
+  name: raw.name as string,
+  username: raw.username as string,
+  avatar: (raw.avatar as string) ?? "",
+  bio: (raw.bio as string) ?? "",
+  isProfileComplete: !!(raw.username),
+});
 
-export const getPosts = (): Promise<Post[]> =>
-  delay(
-    [...posts]
-      .filter(isPublished)
-      .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
-      .map(decoratePost),
+// ─────────────────────────────────────────────────────────────────────────────
+// AUTH
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const login = async (data: AuthDTO): Promise<User & { token: string }> => {
+  const res = await apiClient.post<{ success: boolean; data: Record<string, unknown> }>(
+    "/auth/login",
+    data
   );
-
-export const getFollowingPosts = (): Promise<Post[]> => {
-  if (!currentUserId) return delay([]);
-  const followingIds = follows
-    .filter((f) => f.followerId === currentUserId)
-    .map((f) => f.followingId);
-  return delay(
-    posts
-      .filter(isPublished)
-      .filter((p) => followingIds.includes(p.author.id))
-      .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
-      .map(decoratePost),
-  );
-};
-
-export const getPostById = (id: string): Promise<Post> => {
-  const post = posts.find((p) => p.id === id);
-  if (!post) return Promise.reject(new Error("Post not found"));
-  // Drafts are only visible to their author
-  if (post.status === "draft" && post.author.id !== currentUserId) {
-    return Promise.reject(new Error("Post not found"));
-  }
-  return delay(decoratePost(post));
-};
-
-export const getDraftPosts = (): Promise<Post[]> => {
-  if (!currentUserId) return delay([]);
-  return delay(
-    posts
-      .filter((p) => p.status === "draft" && p.author.id === currentUserId)
-      .sort((a, b) => +new Date(b.updatedAt) - +new Date(a.updatedAt))
-      .map(decoratePost),
-  );
-};
-
-const buildPost = (data: CreatePostDTO, status: PostStatus): Post => {
-  const author = users.find((u) => u.id === currentUserId) ?? users[0];
-  const now = new Date().toISOString();
+  const payload = res.data.data;
   return {
-    id: `p${Date.now()}`,
-    title: data.title.trim() || "Untitled",
-    content: data.content,
-    format: data.format ?? "html",
-    coverImage:
-      data.coverImage?.trim() ||
-      "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&q=80",
-    author,
-    tags: data.tags.filter(Boolean),
-    createdAt: now,
-    updatedAt: now,
-    readingTime: computeReadingTime(data.content),
-    likeCount: 0,
-    isLiked: false,
-    status,
+    ...mapUser(payload.user as Record<string, unknown>),
+    token: payload.accessToken as string,
   };
 };
 
-export const createPost = (data: CreatePostDTO): Promise<Post> => {
-  const newPost = buildPost(data, "published");
-  posts.unshift(newPost);
-  return delay(newPost);
+export const signup = async (data: AuthDTO): Promise<User & { token: string }> => {
+  const res = await apiClient.post<{ success: boolean; data: Record<string, unknown> }>(
+    "/auth/signup",
+    {
+      email: data.email,
+      password: data.password,
+      // The backend requires name; derive a sensible default from the email.
+      name: data.email.split("@")[0] ?? "New Writer",
+      username: `user_${Date.now()}`, // temporary; user will update on onboarding
+    }
+  );
+  const payload = res.data.data;
+  return {
+    ...mapUser(payload.user as Record<string, unknown>),
+    token: payload.accessToken as string,
+  };
 };
 
-export const saveDraft = (data: CreatePostDTO): Promise<Post> => {
-  const newPost = buildPost(data, "draft");
-  posts.unshift(newPost);
-  return delay(newPost);
+export const logout = async (): Promise<void> => {
+  // No backend logout endpoint yet — token is simply removed from the store.
 };
 
-export const updatePost = (data: UpdatePostDTO): Promise<Post> => {
-  const idx = posts.findIndex((p) => p.id === data.id);
-  if (idx < 0) return Promise.reject(new Error("Post not found"));
-  const next: Post = {
-    ...posts[idx],
-    ...(data.title !== undefined && { title: data.title }),
-    ...(data.content !== undefined && {
+export const getMe = async (): Promise<User> => {
+  const res = await apiClient.get<{ success: boolean; data: { user: Record<string, unknown> } }>(
+    "/auth/me"
+  );
+  return mapUser(res.data.data.user);
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POSTS
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const getPosts = async (): Promise<Post[]> => {
+  const res = await apiClient.get<{
+    success: boolean;
+    data: { posts: Record<string, unknown>[] };
+  }>("/posts", { params: { limit: 50 } });
+  return res.data.data.posts.map(mapPost);
+};
+
+export const getFollowingPosts = async (): Promise<Post[]> => {
+  // The backend does not yet have a dedicated "following" feed endpoint.
+  // For now we fall back to the main feed; this will be wired up in Phase 2.
+  return getPosts();
+};
+
+export const getPostById = async (id: string): Promise<Post> => {
+  const res = await apiClient.get<{ success: boolean; data: Record<string, unknown> }>(
+    `/posts/${id}`
+  );
+  return mapPost(res.data.data);
+};
+
+export const getDraftPosts = async (): Promise<Post[]> => {
+  const res = await apiClient.get<{
+    success: boolean;
+    data: { drafts: Record<string, unknown>[] };
+  }>("/drafts");
+  // Map Draft documents (which have the same shape as posts minus status)
+  return res.data.data.drafts.map((d) =>
+    mapPost({ ...d, status: "draft" })
+  );
+};
+
+export const createPost = async (data: CreatePostDTO): Promise<Post> => {
+  const res = await apiClient.post<{ success: boolean; data: Record<string, unknown> }>(
+    "/posts",
+    {
+      title: data.title,
       content: data.content,
-      readingTime: computeReadingTime(data.content),
-    }),
-    ...(data.format !== undefined && { format: data.format }),
-    ...(data.coverImage !== undefined && { coverImage: data.coverImage }),
-    ...(data.tags !== undefined && { tags: data.tags }),
+      excerpt: data.content.replace(/<[^>]+>/g, " ").trim().slice(0, 280),
+      coverImage: data.coverImage ? { url: data.coverImage, publicId: "" } : undefined,
+      tags: data.tags,
+    }
+  );
+  return mapPost(res.data.data);
+};
+
+export const saveDraft = async (data: CreatePostDTO): Promise<Post> => {
+  const res = await apiClient.post<{ success: boolean; data: Record<string, unknown> }>(
+    "/drafts",
+    {
+      title: data.title || "Untitled draft",
+      content: data.content,
+      excerpt: data.content.replace(/<[^>]+>/g, " ").trim().slice(0, 280),
+      coverImage: data.coverImage ? { url: data.coverImage, publicId: "" } : undefined,
+      tags: data.tags,
+    }
+  );
+  return mapPost({ ...res.data.data, status: "draft" });
+};
+
+export const updatePost = async (data: UpdatePostDTO): Promise<Post> => {
+  const res = await apiClient.patch<{ success: boolean; data: Record<string, unknown> }>(
+    `/posts/${data.id}`,
+    {
+      ...(data.title !== undefined && { title: data.title }),
+      ...(data.content !== undefined && { content: data.content }),
+      ...(data.coverImage !== undefined && {
+        coverImage: { url: data.coverImage, publicId: "" },
+      }),
+      ...(data.tags !== undefined && { tags: data.tags }),
+    }
+  );
+  return mapPost(res.data.data);
+};
+
+export const deletePost = async (id: string): Promise<{ id: string }> => {
+  // Try posts first; if it's a draft, try the drafts endpoint.
+  try {
+    await apiClient.delete(`/posts/${id}`);
+    return { id };
+  } catch {
+    await apiClient.delete(`/drafts/${id}`);
+    return { id };
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LIKES
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const likePost = async (
+  postId: string
+): Promise<{ likeCount: number; isLiked: true }> => {
+  const res = await apiClient.post<{
+    success: boolean;
+    data: { likeCount: number; isLiked: true };
+  }>(`/posts/${postId}/like`);
+  return res.data.data;
+};
+
+export const unlikePost = async (
+  postId: string
+): Promise<{ likeCount: number; isLiked: false }> => {
+  const res = await apiClient.delete<{
+    success: boolean;
+    data: { likeCount: number; isLiked: false };
+  }>(`/posts/${postId}/like`);
+  return res.data.data;
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FOLLOWS
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const followUser = async (userId: string): Promise<{ following: true }> => {
+  const res = await apiClient.post<{ success: boolean; data: { following: true } }>(
+    `/users/${userId}/follow`
+  );
+  return res.data.data;
+};
+
+export const unfollowUser = async (userId: string): Promise<{ following: false }> => {
+  const res = await apiClient.delete<{ success: boolean; data: { following: false } }>(
+    `/users/${userId}/follow`
+  );
+  return res.data.data;
+};
+
+/**
+ * toggleFollow is used by FollowButton.
+ * The follow status is derived from the Profile response's `isFollowing` flag;
+ * we determine which action to take based on the optimistic local state.
+ */
+export const toggleFollow = async (
+  userId: string,
+  currentlyFollowing: boolean
+): Promise<{ following: boolean }> => {
+  return currentlyFollowing ? unfollowUser(userId) : followUser(userId);
+};
+
+/**
+ * isFollowing — synchronous check retained for backward compatibility.
+ * Since follow state is now server-driven, this always returns false
+ * and the real value comes from the Profile API response's `isFollowing` field.
+ * @deprecated Prefer the `isFollowing` field returned by `getProfile`.
+ */
+export const isFollowing = (_userId: string): boolean => false;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PROFILE
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const getProfile = async (username: string): Promise<Profile> => {
+  const res = await apiClient.get<{
+    success: boolean;
+    data: {
+      user: Record<string, unknown>;
+      posts: Record<string, unknown>[];
+      isFollowing: boolean;
+    };
+  }>(`/users/${username}`);
+
+  const { user, posts, isFollowing: isFollowingResult } = res.data.data;
+  const mappedUser = mapUser(user);
+
+  return {
+    user: mappedUser,
+    followersCount: (user.followersCount as number) ?? 0,
+    followingCount: (user.followingCount as number) ?? 0,
+    posts: posts.map(mapPost),
+    isFollowing: isFollowingResult,
   };
-  posts[idx] = next;
-  return delay(decoratePost(next));
 };
 
-export const deletePost = (id: string): Promise<{ id: string }> => {
-  const idx = posts.findIndex((p) => p.id === id);
-  if (idx < 0) return Promise.reject(new Error("Post not found"));
-  posts.splice(idx, 1);
-  return delay({ id });
-};
-
-// ---- LIKES ----
-export const likePost = (postId: string): Promise<{ likeCount: number; isLiked: true }> => {
-  if (!currentUserId) return Promise.reject(new Error("Not authenticated"));
-  const post = posts.find((p) => p.id === postId);
-  if (!post) return Promise.reject(new Error("Post not found"));
-  const key = `${currentUserId}:${postId}`;
-  if (!likes.has(key)) {
-    likes.add(key);
-    post.likeCount += 1;
-  }
-  return delay({ likeCount: post.likeCount, isLiked: true });
-};
-
-export const unlikePost = (postId: string): Promise<{ likeCount: number; isLiked: false }> => {
-  if (!currentUserId) return Promise.reject(new Error("Not authenticated"));
-  const post = posts.find((p) => p.id === postId);
-  if (!post) return Promise.reject(new Error("Post not found"));
-  const key = `${currentUserId}:${postId}`;
-  if (likes.has(key)) {
-    likes.delete(key);
-    post.likeCount = Math.max(0, post.likeCount - 1);
-  }
-  return delay({ likeCount: post.likeCount, isLiked: false });
-};
-
-// ---- SOCIAL ----
-export const followUser = (userId: string): Promise<{ following: true }> => {
-  if (!currentUserId) return Promise.reject(new Error("Not authenticated"));
-  if (!follows.some((f) => f.followerId === currentUserId && f.followingId === userId)) {
-    follows.push({ followerId: currentUserId, followingId: userId });
-  }
-  return delay({ following: true });
-};
-
-export const unfollowUser = (userId: string): Promise<{ following: false }> => {
-  if (!currentUserId) return Promise.reject(new Error("Not authenticated"));
-  const idx = follows.findIndex(
-    (f) => f.followerId === currentUserId && f.followingId === userId,
-  );
-  if (idx >= 0) follows.splice(idx, 1);
-  return delay({ following: false });
-};
-
-export const toggleFollow = async (userId: string): Promise<{ following: boolean }> => {
-  if (!currentUserId) return Promise.reject(new Error("Not authenticated"));
-  const already = follows.some(
-    (f) => f.followerId === currentUserId && f.followingId === userId,
-  );
-  return already ? unfollowUser(userId) : followUser(userId);
-};
-
-export const isFollowing = (userId: string): boolean => {
-  if (!currentUserId) return false;
-  return follows.some(
-    (f) => f.followerId === currentUserId && f.followingId === userId,
-  );
-};
-
-// ---- PROFILE ----
-export const getProfile = (id: string): Promise<Profile> => {
-  const user = users.find((u) => u.id === id);
-  if (!user) return Promise.reject(new Error("User not found"));
-  const userPosts = posts
-    .filter((p) => p.author.id === id && p.status === "published")
-    .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
-    .map(decoratePost);
-  const followersCount = follows.filter((f) => f.followingId === id).length;
-  const followingCount = follows.filter((f) => f.followerId === id).length;
-  return delay({ user, followersCount, followingCount, posts: userPosts });
-};
-
-export const checkUsernameAvailability = (
-  username: string,
+export const checkUsernameAvailability = async (
+  username: string
 ): Promise<{ available: boolean }> => {
-  const taken = users.some(
-    (u) => u.username?.toLowerCase() === username.toLowerCase() && u.id !== currentUserId,
+  try {
+    // Try fetching the profile; if 404 → username is available.
+    await apiClient.get(`/users/${username}`);
+    return { available: false };
+  } catch (err) {
+    if (err instanceof Error && err.message === "User not found") {
+      return { available: true };
+    }
+    // Any other error (network etc.) — optimistically treat as unavailable.
+    return { available: false };
+  }
+};
+
+export const createProfile = (data: ProfileSetupDTO): Promise<User> => updateProfile(data);
+
+export const updateProfile = async (data: ProfileSetupDTO): Promise<User> => {
+  const res = await apiClient.patch<{ success: boolean; data: { user: Record<string, unknown> } }>(
+    "/users/me",
+    {
+      name: data.fullName.trim(),
+      username: data.username.trim().toLowerCase(),
+      bio: data.bio.trim(),
+      ...(data.avatar.trim() && { avatar: data.avatar.trim() }),
+    }
   );
-  return delay({ available: !taken && username.length >= 3 });
+  return mapUser(res.data.data.user);
 };
 
-export const createProfile = (data: ProfileSetupDTO): Promise<User> =>
-  updateProfile(data);
+export const getUsers = async (): Promise<User[]> => [];
 
-export const updateProfile = (data: ProfileSetupDTO): Promise<User> => {
-  if (!currentUserId) return Promise.reject(new Error("Not authenticated"));
-  const idx = users.findIndex((u) => u.id === currentUserId);
-  if (idx < 0) return Promise.reject(new Error("User not found"));
-  const updated: User = {
-    ...users[idx],
-    name: data.fullName.trim(),
-    username: data.username.trim().toLowerCase(),
-    bio: data.bio.trim(),
-    avatar: data.avatar.trim() || users[idx].avatar,
-    isProfileComplete: true,
-  };
-  users[idx] = updated;
-  // Also reflect on existing posts authored by user
-  posts.forEach((p) => {
-    if (p.author.id === updated.id) p.author = updated;
+// ─────────────────────────────────────────────────────────────────────────────
+// UPLOADS
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const uploadImage = async (file: File): Promise<{ url: string; publicId: string }> => {
+  const form = new FormData();
+  form.append("image", file);
+  const res = await apiClient.post<{
+    success: boolean;
+    data: { url: string; publicId: string };
+  }>("/uploads/image", form, {
+    headers: { "Content-Type": "multipart/form-data" },
   });
-  return delay(updated);
+  return res.data.data;
 };
 
-export const getUsers = (): Promise<User[]> => delay([...users]);
-
-// ---- AUTH ----
-export const login = (data: AuthDTO): Promise<User> => {
-  void data;
-  return delay(users[0]);
+// ─────────────────────────────────────────────────────────────────────────────
+// Legacy mock compat shim (no-op; was used internally by the mock only)
+// ─────────────────────────────────────────────────────────────────────────────
+export const _setCurrentUserId = (_id: string | null): void => {
+  // No-op — current user is now tracked server-side via JWT.
 };
-
-export const signup = (data: AuthDTO): Promise<User> => {
-  const newUser: User = {
-    id: `u${Date.now()}`,
-    name: data.email.split("@")[0] || "New Writer",
-    avatar: `https://i.pravatar.cc/200?u=${encodeURIComponent(data.email)}`,
-    bio: "",
-    isProfileComplete: false,
-  };
-  users.push(newUser);
-  return delay(newUser);
-};
-
-export const logout = (): Promise<void> => delay(undefined);

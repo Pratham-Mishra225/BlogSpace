@@ -10,7 +10,7 @@ interface Props {
 export function AuthorBio({ author, onAuthRequired }: Props) {
   return (
     <aside className="mt-16 flex flex-col gap-4 rounded-lg border border-border bg-card p-6 sm:flex-row sm:items-center">
-      <Link to="/profile/$id" params={{ id: author.id }}>
+      <Link to="/profile/$id" params={{ id: author.username ?? author.id }}>
         <img
           src={author.avatar}
           alt={author.name}
@@ -20,7 +20,7 @@ export function AuthorBio({ author, onAuthRequired }: Props) {
       <div className="flex-1">
         <Link
           to="/profile/$id"
-          params={{ id: author.id }}
+          params={{ id: author.username ?? author.id }}
           className="font-serif text-xl text-foreground hover:underline"
         >
           {author.name}

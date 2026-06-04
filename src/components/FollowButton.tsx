@@ -1,17 +1,20 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { isFollowing as checkFollowing, toggleFollow } from "@/services/api";
+import { followUser, unfollowUser } from "@/services/api";
 import { toast } from "sonner";
 
 interface Props {
+  /** MongoDB ObjectId of the user to follow/unfollow */
   userId: string;
+  /** Initial follow state — pass from the Profile API response's isFollowing field */
+  initialFollowing?: boolean;
   onAuthRequired?: () => void;
 }
 
-export function FollowButton({ userId, onAuthRequired }: Props) {
+export function FollowButton({ userId, initialFollowing = false, onAuthRequired }: Props) {
   const { isAuthenticated } = useAuth();
-  const [following, setFollowing] = useState<boolean>(() => checkFollowing(userId));
+  const [following, setFollowing] = useState<boolean>(initialFollowing);
   const [pending, setPending] = useState(false);
 
   const handle = async () => {
@@ -21,8 +24,13 @@ export function FollowButton({ userId, onAuthRequired }: Props) {
     }
     setPending(true);
     try {
-      const res = await toggleFollow(userId);
-      setFollowing(res.following);
+      if (following) {
+        const res = await unfollowUser(userId);
+        setFollowing(res.following);
+      } else {
+        const res = await followUser(userId);
+        setFollowing(res.following);
+      }
     } catch (e) {
       toast.error((e as Error).message);
     } finally {

@@ -8,6 +8,8 @@ export interface User {
   bio: string;
   username?: string;
   isProfileComplete?: boolean;
+  /** JWT access token — present only on login/signup responses */
+  token?: string;
 }
 
 export interface Post {
@@ -31,6 +33,8 @@ export interface Profile {
   followersCount: number;
   followingCount: number;
   posts: Post[];
+  /** Whether the currently logged-in viewer follows this user */
+  isFollowing?: boolean;
 }
 
 export interface CreatePostDTO {

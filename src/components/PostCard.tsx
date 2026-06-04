@@ -53,7 +53,7 @@ export function PostCard({ post, canDelete, onDeleted }: Props) {
           <p className="text-sm leading-relaxed text-muted-foreground">
             {truncate(excerpt, 140)}
           </p>
-          <div className="mt-2 flex items-center gap-3 border-t border-border pt-4">
+          <div className="flex items-center gap-3 border-t border-border pt-4">
             <img
               src={post.author.avatar}
               alt={post.author.name}
