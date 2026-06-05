@@ -29,12 +29,16 @@ export function PostCard({ post, canDelete, onDeleted }: Props) {
         aria-label={post.title}
       >
         <div className="aspect-[16/10] overflow-hidden bg-muted">
-          <img
-            src={post.coverImage}
-            alt=""
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
+          {post.coverImage ? (
+            <img
+              src={post.coverImage}
+              alt=""
+              loading="lazy"
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="h-full w-full bg-gradient-to-br from-muted to-muted/60" />
+          )}
         </div>
         <div className="flex flex-col gap-3 p-6">
           <div className="flex flex-wrap gap-2">
@@ -54,11 +58,17 @@ export function PostCard({ post, canDelete, onDeleted }: Props) {
             {truncate(excerpt, 140)}
           </p>
           <div className="flex items-center gap-3 border-t border-border pt-4">
-            <img
-              src={post.author.avatar}
-              alt={post.author.name}
-              className="h-8 w-8 rounded-full object-cover"
-            />
+            {post.author.avatar ? (
+              <img
+                src={post.author.avatar}
+                alt={post.author.name}
+                className="h-8 w-8 rounded-full object-cover"
+              />
+            ) : (
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
+                {post.author.name?.charAt(0).toUpperCase() ?? "?"}
+              </span>
+            )}
             <div className="flex-1 text-xs text-muted-foreground">
               <div className="font-medium text-foreground">{post.author.name}</div>
               <div>

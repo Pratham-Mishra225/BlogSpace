@@ -71,11 +71,17 @@ function PostPage() {
 
         <div className="mt-6 flex items-center gap-3 border-b border-border pb-6">
           <Link to="/profile/$id" params={{ id: data.author.username ?? data.author.id }}>
-            <img
-              src={data.author.avatar}
-              alt={data.author.name}
-              className="h-10 w-10 rounded-full object-cover"
-            />
+            {data.author.avatar ? (
+              <img
+                src={data.author.avatar}
+                alt={data.author.name}
+                className="h-10 w-10 rounded-full object-cover"
+              />
+            ) : (
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-sm font-semibold text-muted-foreground">
+                {data.author.name?.charAt(0).toUpperCase() ?? "?"}
+              </span>
+            )}
           </Link>
           <div className="text-sm">
             <Link
@@ -116,7 +122,7 @@ function PostPage() {
               <DeletePostButton
                 postId={data.id}
                 onDeleted={() =>
-                  navigate({ to: "/profile/$id", params: { id: data.author.id } })
+                  navigate({ to: "/profile/$id", params: { id: data.author.username ?? data.author.id } })
                 }
               />
             )}

@@ -88,11 +88,17 @@ function ProfilePage() {
       <section className="border-b border-border">
         <div className="mx-auto max-w-5xl px-6 py-16">
           <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center">
-            <img
-              src={data.user.avatar}
-              alt={data.user.name}
-              className="h-24 w-24 rounded-full object-cover"
-            />
+            {data.user.avatar ? (
+              <img
+                src={data.user.avatar}
+                alt={data.user.name}
+                className="h-24 w-24 rounded-full object-cover"
+              />
+            ) : (
+              <span className="flex h-24 w-24 items-center justify-center rounded-full bg-muted text-3xl font-semibold text-muted-foreground">
+                {data.user.name?.charAt(0).toUpperCase() ?? "?"}
+              </span>
+            )}
             <div className="flex-1">
               <h1 className="font-serif text-4xl text-foreground">{data.user.name}</h1>
               <p className="mt-2 max-w-xl text-muted-foreground">{data.user.bio}</p>

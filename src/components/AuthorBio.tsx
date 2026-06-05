@@ -11,11 +11,17 @@ export function AuthorBio({ author, onAuthRequired }: Props) {
   return (
     <aside className="mt-16 flex flex-col gap-4 rounded-lg border border-border bg-card p-6 sm:flex-row sm:items-center">
       <Link to="/profile/$id" params={{ id: author.username ?? author.id }}>
-        <img
-          src={author.avatar}
-          alt={author.name}
-          className="h-16 w-16 rounded-full object-cover"
-        />
+        {author.avatar ? (
+          <img
+            src={author.avatar}
+            alt={author.name}
+            className="h-16 w-16 rounded-full object-cover"
+          />
+        ) : (
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-muted text-xl font-semibold text-muted-foreground">
+            {author.name?.charAt(0).toUpperCase() ?? "?"}
+          </span>
+        )}
       </Link>
       <div className="flex-1">
         <Link

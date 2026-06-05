@@ -88,16 +88,22 @@ export function Navbar() {
                     className="ml-1 h-9 w-9 overflow-hidden rounded-full border border-border"
                     aria-label="Account"
                   >
-                    <img
-                      src={user.avatar}
-                      alt={user.name}
-                      className="h-full w-full object-cover"
-                    />
+                    {user.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt={user.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center bg-muted text-sm font-semibold text-muted-foreground">
+                        {user.name?.charAt(0).toUpperCase() ?? "U"}
+                      </span>
+                    )}
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem
-                    onClick={() => navigate({ to: "/profile/$id", params: { id: user.id } })}
+                    onClick={() => navigate({ to: "/profile/$id", params: { id: user.username } })}
                   >
                     Profile
                   </DropdownMenuItem>

@@ -1,10 +1,8 @@
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
 import Image from "@tiptap/extension-image";
 import TextAlign from "@tiptap/extension-text-align";
 import Placeholder from "@tiptap/extension-placeholder";
-import Link from "@tiptap/extension-link";
 import {
   Bold,
   Italic,
@@ -35,10 +33,12 @@ interface Props {
 export function RichTextEditor({ value, onChange, disabled, placeholder }: Props) {
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({ heading: { levels: [1, 2, 3] } }),
-      Underline,
+      StarterKit.configure({
+        heading: { levels: [1, 2, 3] },
+        // Link and Underline are bundled in StarterKit v3; configure them here.
+        link: { openOnClick: false, autolink: true },
+      }),
       Image,
-      Link.configure({ openOnClick: false, autolink: true }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Placeholder.configure({
         placeholder: placeholder ?? "Tell your story…",
