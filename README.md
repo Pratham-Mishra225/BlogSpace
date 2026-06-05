@@ -1,715 +1,269 @@
 # BlogSpace
 
-BlogSpace is a full-stack publishing platform for thoughtful long-form writing. The frontend presents a quiet, editorial reading and writing experience built with React, TanStack Router, Tailwind CSS, TipTap, Zustand, and shadcn/Radix UI primitives. The backend provides a production-style Express and MongoDB API foundation with authentication, validation, security middleware, and Mongoose domain models.
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-5-000000?logo=express&logoColor=white)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/atlas)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-The project currently has two distinct layers:
+BlogSpace is a full-stack publishing platform for writers and readers who value thoughtful long-form content. It combines a polished React reading experience, a rich text writing workflow, authenticated user profiles, and a production-style Express API backed by MongoDB.
 
-- The frontend is a polished working demo that uses an in-memory mock API in `src/services/api.ts`.
-- The backend is a real Node.js/Express API foundation with live health and auth endpoints, plus scaffolded post, draft, user, upload, like, and follow modules ready for feature wiring.
+The project exists to demonstrate modern full-stack engineering practices in a portfolio-ready application: clean UI architecture, REST API design, authentication, content workflows, database modeling, validation, and deployable frontend/backend separation.
 
-## Table of Contents
+## Features
 
-- [Product Overview](#product-overview)
-- [Current Status](#current-status)
-- [Feature Highlights](#feature-highlights)
-- [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Environment Variables](#environment-variables)
-- [Available Scripts](#available-scripts)
-- [Frontend Routes](#frontend-routes)
-- [Backend API](#backend-api)
-- [Data Model Overview](#data-model-overview)
-- [Development Notes](#development-notes)
-- [Deployment Notes](#deployment-notes)
-- [Roadmap](#roadmap)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
+### Reading and Discovery
 
-## Product Overview
-
-BlogSpace is designed as a minimalist writing and reading application. Its interface focuses on calm typography, readable article layouts, writer profiles, and lightweight social interactions such as likes and follows.
-
-Users can browse published stories, search across titles/authors/tags, switch between an explore feed and a following feed, open detailed article pages, authenticate through a modal flow, create a profile, write rich-text posts, save drafts, publish stories, like posts, follow authors, and share article links.
-
-The product direction is similar to a focused publishing community: more intentional than a fast social feed, more personal than a generic CMS, and structured enough to grow into a real multi-author blogging platform.
-
-## Current Status
-
-| Area                | Status        | Notes                                              
-|---------------------|---------------|-------------------------------------------------------------------------------|
-| Frontend UI         | Working demo  | Built with seeded in-memory data and realistic interactions.                  |                             
-| Frontend auth       | Mocked        | Auth state is persisted with Zustand local storage.                           |
-| Frontend publishing | Mocked        | Posts and drafts are created in memory and reset  on full reload .            |                             
-| Backend health API  | Live          | `GET /api` and `GET /api/health` are active.                                  |                             
-| Backend auth API    | Live          | Signup, login, and current-user routes are implemented.                       |                             
-| Backend content API | Scaffolded    | Models/services/controllers exist, but most content routes are not wired yet. |                             
-| Database            | Backend-ready | MongoDB/Mongoose configuration and schemas are present.                       |
-| Media uploads       | Scaffolded    | Cloudinary configuration and upload modules exist, route wiring is reserved.  |
-
-## Feature Highlights
-
-### Reader Experience
-
-- Editorial home page with a restrained hero and responsive post grid.
+- Editorial home feed with responsive post cards.
+- Search across story titles, tags, and writers.
 - Explore and following feed modes.
-- Search filtering across post titles, authors, and tags.
-- Detailed article pages with cover images, metadata, tags, reading time, and author details.
-- Markdown and HTML rendering support through a shared renderer.
-- Empty states, loading skeletons, error states, and retry actions.
+- Article pages with cover images, tags, reading time, author metadata, and share actions.
+- Markdown/HTML rendering support for rich article content.
+- Loading skeletons, empty states, retry states, and responsive layouts.
 
-### Writer Experience
+### Writing and Publishing
 
-- Rich-text editor powered by TipTap.
-- Formatting toolbar for headings, bold, italic, underline, lists, quotes, code blocks, alignment, links, images, and dividers.
-- Post metadata fields for title, cover image URL, and comma-separated tags.
-- Publish flow and draft-saving flow.
-- Owner-only delete actions on posts and drafts in the UI.
+- TipTap-powered rich text editor.
+- Formatting controls for headings, bold, italic, underline, lists, quotes, code blocks, alignment, links, images, and dividers.
+- Post metadata fields for title, cover image, and tags.
+- Draft saving, draft management, and publish flow.
+- Owner-only edit/delete workflows for content management.
 
-### Social and Profile Features
+### Accounts and Social Features
 
-- Auth dialog with sign-in and create-account tabs.
-- Profile onboarding with full name, username, bio, and avatar URL.
-- Username availability checks in the mock frontend service.
-- Public profile pages with follower/following/story counts.
-- Published and draft tabs on the current user's profile.
+- Email/password authentication with JWT-backed API sessions.
+- Profile onboarding with name, username, bio, and avatar.
+- Public writer profiles with published stories and profile statistics.
 - Follow/unfollow interactions.
-- Like/unlike interactions.
-- Share menu for article sharing.
+- Like/unlike interactions with persisted counts.
+- Theme switching with persisted preference.
 
-### Design System and UX
+### Engineering Highlights
 
-- Light and dark themes with persisted preference.
-- Typography tuned for long-form reading with Playfair Display and Inter.
-- shadcn-style UI components built on Radix primitives.
-- Lucide icons for interface controls.
-- Toast notifications through Sonner.
-- Framer Motion page transitions.
-- Responsive layout across mobile and desktop breakpoints.
+- Type-safe frontend domain models with React and TypeScript.
+- File-based routing with TanStack Router.
+- Local client state with Zustand.
+- Centralized Axios API client with auth token injection.
+- Express 5 REST API organized by routes, controllers, services, models, middleware, and validators.
+- Zod request and environment validation.
+- Mongoose schemas with indexes, hooks, ownership checks, and denormalized counters.
+- Security and operational middleware including Helmet, CORS, Morgan, and centralized error handling.
+
+## Screenshots
+
+| Home | Editor |
+| --- | --- |
+| ![BlogSpace home feed](docs/screenshots/home.png) | ![BlogSpace editor](docs/screenshots/editor.png) |
+
+| Article | Profile |
+| --- | --- |
+| ![BlogSpace article page](docs/screenshots/article.png) | ![BlogSpace profile page](docs/screenshots/profile.png) |
 
 ## Tech Stack
 
-### Frontend
-
-| Technology                  | Purpose                                                  |
-| --------------------------- | -------------------------------------------------------- |
-| React 19                    | Component model and UI rendering.                        |
-| TypeScript                  | Static typing for frontend domain models and components. |
-| Vite                        | Development server and build tooling.                    |
-| TanStack Router / Start     | File-based routing and app shell.                        |
-| Zustand                     | Local state management and persistence.                  |
-| Tailwind CSS 4              | Utility-first styling and design tokens.                 |
-| Radix UI                    | Accessible low-level UI primitives.                      |
-| shadcn-style components     | Composable UI building blocks in `src/components/ui`.    |
-| TipTap                      | Rich-text editor experience.                             |
-| React Markdown / remark-gfm | Markdown rendering for article content.                  |
-| Framer Motion               | Page transition animation.                               |
-| Lucide React                | Icon set.                                                |
-| Sonner                      | Toast notifications.                                     |
-
-### Backend
-
-| Technology          | Purpose                                      |
-| ------------------- | -------------------------------------------- |
-| Node.js             | Runtime.                                     |
-| Express 5           | HTTP API framework.                          |
-| MongoDB             | Database.                                    |
-| Mongoose            | Schema modeling, indexes, validation, hooks. |
-| Zod                 | Request and environment validation.          |
-| bcryptjs            | Password hashing.                            |
-| JSON Web Tokens     | Bearer-token authentication.                 |
-| Helmet              | Security headers.                            |
-| CORS                | Frontend/backend cross-origin access.        |
-| cookie-parser       | Cookie parsing for optional token transport. |
-| Morgan              | Request logging.                             |
-| Multer / Cloudinary | Upload pipeline foundation.                  |
-| Nodemon             | Backend development reloads.                 |
+| Area | Technologies |
+| --- | --- |
+| Frontend | React 19, TypeScript, Vite, TanStack Router, Tailwind CSS, Radix UI, TipTap, Zustand, Axios, Framer Motion, Sonner, Lucide React |
+| Backend | Node.js, Express 5, JWT, bcryptjs, Zod, Helmet, CORS, Morgan, Multer, Cloudinary |
+| Database | MongoDB Atlas, Mongoose |
+| Deployment | Frontend static/app hosting, Node.js API hosting, MongoDB Atlas, environment-based configuration |
 
 ## Architecture
 
-BlogSpace is organized as a frontend application at the repository root and a backend API inside `backend/`.
-
 ```text
-Browser
-  |
-  | current frontend demo calls
-  v
-src/services/api.ts
-  |
-  | in-memory seeded users, posts, follows, likes, drafts
-  v
-React UI
-
-Planned production flow:
-
-Browser
-  |
-  | HTTP JSON API
-  v
-Express API in backend/src
-  |
-  | Mongoose
-  v
-MongoDB
+User
+│
+▼
+React Frontend
+│
+▼
+Express REST API
+│
+▼
+MongoDB Atlas
 ```
 
-### Frontend Flow
-
-1. Routes are declared with TanStack Router in `src/routes`.
-2. Pages call custom hooks such as `usePosts`, `usePost`, `useDrafts`, `useProfile`, and `useAuth`.
-3. Hooks call `src/services/api.ts`.
-4. Stores in `src/store` keep auth, theme, search, and feed-mode state.
-5. UI components render the product experience with shared primitives from `src/components/ui`.
-
-### Backend Flow
-
-1. `backend/src/server.js` owns process startup, database connection, and graceful shutdown.
-2. `backend/src/app.js` configures Express middleware, health routes, and mounted routers.
-3. Routers in `backend/src/routes` map HTTP routes to controllers.
-4. Controllers in `backend/src/controllers` manage request/response behavior.
-5. Services in `backend/src/services` own business logic and database workflows.
-6. Mongoose models in `backend/src/models` define persistence structure and indexes.
-7. Middleware handles authentication, validation, uploads, not-found responses, and centralized errors.
+BlogSpace separates the client and API into two deployable layers. The React app handles routing, editor interactions, authentication state, and UI composition. The Express API owns authentication, validation, authorization, content persistence, social relationships, uploads, and database access through Mongoose models.
 
 ## Project Structure
 
 ```text
 BlogSpace/
-+-- src/
-|   +-- components/
-|   |   +-- ui/                    # Shared shadcn/Radix UI components
-|   |   +-- AuthDialog.tsx         # Login/signup modal
-|   |   +-- EditorForm.tsx         # Story editor form
-|   |   +-- PostCard.tsx           # Feed/profile post preview
-|   |   +-- RichTextEditor.tsx     # TipTap editor
-|   |   +-- ...
-|   +-- hooks/                     # Frontend data hooks
-|   +-- lib/                       # Markdown, formatting, utility helpers
-|   +-- routes/                    # TanStack file routes
-|   +-- services/
-|   |   +-- api.ts                 # Mock frontend data service
-|   +-- store/                     # Zustand stores
-|   +-- types/                     # Frontend TypeScript types
-|   +-- router.tsx                 # Router configuration
-|   +-- styles.css                 # Tailwind theme and global styles
-+-- backend/
-|   +-- src/
-|   |   +-- config/                # Env, database, Cloudinary setup
-|   |   +-- controllers/           # HTTP controllers
-|   |   +-- middleware/            # Auth, validation, upload, error handling
-|   |   +-- models/                # Mongoose schemas
-|   |   +-- routes/                # Express routers
-|   |   +-- services/              # Business logic
-|   |   +-- utils/                 # Shared backend helpers
-|   |   +-- validators/            # Zod request schemas
-|   |   +-- app.js                 # Express app
-|   |   +-- server.js              # HTTP server lifecycle
-|   +-- .env.example
-|   +-- package.json
-+-- components.json                # UI component configuration
-+-- eslint.config.js
-+-- package.json                   # Frontend package manifest
-+-- vite.config.ts
-+-- wrangler.jsonc                 # Cloudflare/TanStack deployment config
+|-- src/
+|   |-- components/          # Reusable UI and product components
+|   |-- hooks/               # Frontend data and state hooks
+|   |-- lib/                 # API client, markdown, formatting, utilities
+|   |-- routes/              # TanStack Router pages
+|   |-- services/            # Frontend API service functions
+|   |-- store/               # Zustand stores
+|   |-- types/               # TypeScript domain types
+|   |-- router.tsx           # Router setup
+|   |-- styles.css           # Tailwind theme and global styles
+|-- backend/
+|   |-- src/
+|   |   |-- config/          # Environment, database, and service config
+|   |   |-- controllers/     # HTTP request handlers
+|   |   |-- middleware/      # Auth, validation, upload, and error middleware
+|   |   |-- models/          # Mongoose schemas
+|   |   |-- routes/          # Express route modules
+|   |   |-- services/        # Business logic and data workflows
+|   |   |-- utils/           # Backend helper utilities
+|   |   |-- validators/      # Zod validation schemas
+|   |   |-- app.js           # Express app configuration
+|   |   |-- server.js        # Server lifecycle and database connection
+|   |-- .env.example
+|   |-- package.json
+|-- docs/
+|   |-- screenshots/         # README screenshots
+|-- LICENSE
+|-- package.json
+|-- tsconfig.json
+|-- vite.config.ts
 ```
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 20 or newer is recommended.
-- npm is available by default with Node.js.
-- MongoDB is required only when running the backend API.
-- A Cloudinary account is optional and only needed once upload routes are implemented.
+- Node.js 20 or newer
+- npm
+- MongoDB Atlas connection string or a local MongoDB instance
+- Cloudinary credentials for image upload support
 
-This repository includes both `package-lock.json` and `bun.lockb`. The documented commands use npm because both the root app and backend include npm lockfiles. If your team standardizes on Bun, keep dependency installation consistent across the repository.
-
-### 1. Clone the Repository
+### Frontend Setup
 
 ```bash
 git clone <repository-url>
 cd BlogSpace
-```
-
-### 2. Install Frontend Dependencies
-
-```bash
 npm install
-```
-
-### 3. Start the Frontend
-
-```bash
 npm run dev
 ```
 
-The frontend dev server is served by Vite. It usually runs at:
+The frontend runs locally at:
 
 ```text
 http://localhost:5173
 ```
 
-The frontend can be explored without starting the backend because it currently uses mock data from `src/services/api.ts`.
+Create a root `.env.local` file when connecting the frontend to the local API:
 
-### 4. Install Backend Dependencies
+```env
+VITE_API_URL=http://localhost:5000/api
+```
 
-Open a second terminal:
+### Backend Setup
 
 ```bash
 cd backend
 npm install
-```
-
-### 5. Configure Backend Environment
-
-Create a local backend environment file:
-
-```bash
 cp .env.example .env
+npm run dev
 ```
 
-On Windows PowerShell:
+On Windows PowerShell, create the backend environment file with:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Then update `.env` as needed.
-
-### 6. Start MongoDB
-
-For a local MongoDB instance, make sure MongoDB is running at the URI configured in `.env`.
-
-The default URI is:
-
-```text
-mongodb://127.0.0.1:27017/blogspace
-```
-
-### 7. Start the Backend
-
-From the `backend/` directory:
-
-```bash
-npm run dev
-```
-
-By default, the API starts at:
+The backend runs locally at:
 
 ```text
 http://localhost:5000
 ```
 
-Check the backend health endpoint:
+Health check:
 
 ```bash
 curl http://localhost:5000/api/health
 ```
 
-Expected response:
-
-```json
-{
-  "success": true,
-  "message": "BlogSpace API running"
-}
-```
-
-## Environment Variables
-
-Backend environment variables are defined in `backend/.env.example`.
-
-| Variable                | Required          | Default/Example                       | Description                            |
-| ----------------------- | ----------------- | ------------------------------------- | -------------------------------------- |
-| `NODE_ENV`              | No                | `development`                         | Runtime environment                    |
-| `PORT`                  | No                | `5000`                                | Backend API port.                      |
-| `MONGO_URI`             | Yes               | `mongodb://127.0.0.1:27017/blogspace` | MongoDB connection string.             |
-| `CORS_ORIGIN`           | No                | `http://localhost:5173`               | Allowed frontend origin.               |
-| `JWT_SECRET`            | Yes               | At least 32 characters                | Secret used to sign JWT access tokens. |
-| `JWT_EXPIRES_IN`        | No                | `7d`                                  | Access token lifetime.                 |
-| `CLOUDINARY_CLOUD_NAME` | Future upload use | Empty                                 | Cloudinary cloud name.                 |
-| `CLOUDINARY_API_KEY`    | Future upload use | Empty                                 | Cloudinary API key.                    |
-| `CLOUDINARY_API_SECRET` | Future upload use | Empty                                 | Cloudinary API secret.                 |
-
-Important backend validation rules:
-
-- `JWT_SECRET` must be at least 32 characters.
-- `MONGO_URI` must be present.
-- `PORT` must be a positive integer.
-- `NODE_ENV` must be one of `development`, `test`, or `production`.
-
-## Available Scripts
-
-### Frontend Scripts
-
-Run these from the repository root.
-
-| Command             | Description                             |
-| ------------------- | --------------------------------------- |
-| `npm run dev`       | Start the Vite development server.      |
-| `npm run build`     | Build the frontend for production.      |
-| `npm run build:dev` | Build the frontend in development mode. |
-| `npm run preview`   | Preview the production build locally.   |
-| `npm run lint`      | Run ESLint over the project.            |
-| `npm run format`    | Format files with Prettier.             |
-
-### Backend Scripts
-
-Run these from `backend/`.
-
-| Command       | Description                     |
-| ------------- | ------------------------------- |
-| `npm run dev` | Start the backend with Nodemon. |
-| `npm start`   | Start the backend with Node.js. |
-
-## Frontend Routes
-
-| Route          | Purpose                                                                                                         |
-| -------------- | --------------------------------------------------------------------------------------------------------------- |
-| `/`            | Home feed with hero, search results, explore/following toggle, and post cards.                                  |
-| `/post/$id`    | Full article page with author metadata, content, likes, share menu, delete action for owners, and author bio.   |
-| `/profile/$id` | Public profile page with writer details, counts, published stories, follow button, and current-user drafts tab. |
-| `/editor`      | Rich-text story editor for publishing posts or saving drafts.                                                   |
-| `/onboarding`  | Profile setup flow for authenticated users.                                                                     |
-
-The root route also defines document metadata, global fonts, the navigation bar, toast container, and not-found handling.
-
-## Backend API
-
-The backend is mounted under `/api`.
-
-### Health and Root Routes
-
-#### `GET /api`
-
-Returns a welcome response.
-
-```json
-{
-  "success": true,
-  "message": "Welcome to the BlogSpace API"
-}
-```
-
-#### `GET /api/health`
-
-Returns a health check response.
-
-```json
-{
-  "success": true,
-  "message": "BlogSpace API running"
-}
-```
-
-### Authentication Routes
-
-#### `POST /api/auth/signup`
-
-Creates a user and returns an auth payload.
-
-Request body:
-
-```json
-{
-  "name": "Ada Lovelace",
-  "username": "ada_lovelace",
-  "email": "ada@example.com",
-  "password": "password123",
-  "bio": "Writer, programmer, and notes enthusiast.",
-  "avatar": "https://example.com/avatar.jpg"
-}
-```
-
-Validation highlights:
-
-- `name`: 2 to 80 characters.
-- `username`: 3 to 30 characters, lowercase letters, numbers, and underscores only.
-- `email`: valid email format.
-- `password`: 8 to 128 characters.
-- `bio`: optional, up to 280 characters.
-- `avatar`: optional, up to 2048 characters.
-
-Successful response shape:
-
-```json
-{
-  "success": true,
-  "data": {
-    "user": {
-      "id": "mongo-user-id",
-      "name": "Ada Lovelace",
-      "username": "ada_lovelace",
-      "email": "ada@example.com",
-      "bio": "Writer, programmer, and notes enthusiast.",
-      "avatar": "https://example.com/avatar.jpg",
-      "followersCount": 0,
-      "followingCount": 0,
-      "role": "user",
-      "isEmailVerified": false
-    },
-    "accessToken": "jwt-access-token",
-    "tokenType": "Bearer",
-    "expiresIn": "7d"
-  }
-}
-```
-
-#### `POST /api/auth/login`
-
-Authenticates an existing user.
-
-Request body:
-
-```json
-{
-  "email": "ada@example.com",
-  "password": "password123"
-}
-```
-
-Successful response shape:
-
-```json
-{
-  "success": true,
-  "data": {
-    "user": {
-      "id": "mongo-user-id",
-      "name": "Ada Lovelace",
-      "username": "ada_lovelace",
-      "email": "ada@example.com"
-    },
-    "accessToken": "jwt-access-token",
-    "tokenType": "Bearer",
-    "expiresIn": "7d"
-  }
-}
-```
-
-#### `GET /api/auth/me`
-
-Returns the current authenticated user.
-
-Send the token from signup or login:
-
-```http
-Authorization: Bearer <accessToken>
-```
-
-Successful response shape:
-
-```json
-{
-  "success": true,
-  "data": {
-    "user": {
-      "id": "mongo-user-id",
-      "name": "Ada Lovelace",
-      "username": "ada_lovelace",
-      "email": "ada@example.com"
-    }
-  }
-}
-```
-
-### Reserved Backend Routes
-
-These route groups are mounted in `backend/src/app.js`, but their routers currently contain placeholders rather than active endpoint handlers:
-
-| Route Prefix   | Current Purpose                                      |
-| -------------- | ---------------------------------------------------- |
-| `/api/posts`   | Reserved for post CRUD and published-feed endpoints. |
-| `/api/drafts`  | Reserved for authenticated draft workflows.          |
-| `/api/users`   | Reserved for public profile and account routes.      |
-| `/api/uploads` | Reserved for authenticated media uploads.            |
-
-Related models, services, and controllers already exist for several of these areas. For example, `Post`, `Draft`, `Like`, and `Follow` models are present, and `postService.findPublished()` is available, but the public post routes still need to be connected.
-
-## Data Model Overview
-
-### Frontend Types
-
-Frontend domain types live in `src/types/index.ts`.
-
-Core frontend models:
-
-- `User`: profile identity, avatar, bio, username, profile completion state.
-- `Post`: title, content, format, cover image, author, tags, dates, reading time, likes, status.
-- `Profile`: user details plus follower/following/story counts and posts.
-- `CreatePostDTO`: form payload for publishing or saving drafts.
-- `UpdatePostDTO`: partial update payload for posts.
-- `AuthDTO`: email/password auth payload used by the mock frontend.
-- `ProfileSetupDTO`: onboarding/profile update payload.
-
-### Backend Models
-
-Backend Mongoose models live in `backend/src/models`.
-
-| Model    | Purpose                                | Notable Details                                                                                 |
-| -------- | -------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `User`   | Registered account and public profile. | Unique email and username, password hashing, safe JSON transform, follower/following counts.    |
-| `Post`   | Published article.                     | Author reference, content, cover image, tags, status, reading time, published date, text index. |
-| `Draft`  | Private author draft.                  | Author reference, title/content metadata, cover image, tags, reading time, last-saved timestamp.|
-| `Like`   | User-to-post like edge.                | Unique compound index on user and post.                                                         |
-| `Follow` | User-to-user follow edge.              | Unique compound index on follower and following.                                                |
-
-## Development Notes
-
-### Mock Frontend Service
-
-The frontend currently calls `src/services/api.ts` rather than the Express backend. This file contains seeded users, seeded posts, mock follows, mock likes, and mock drafts. It also simulates latency through a small artificial delay.
-
-Because this service is in-memory:
-
-- Published posts and drafts created in the UI reset on full page reload.
-- Likes and follows reset on full page reload.
-- Auth state and theme state are persisted by Zustand local storage.
-- Backend auth is not yet connected to the UI.
-
-### Frontend/Backend Integration Considerations
-
-When connecting the frontend to the backend, pay special attention to these differences:
-
-- Frontend mock signup accepts `email` and `password`; backend signup requires `name`, `username`, `email`, and `password`.
-- Frontend auth form currently allows 6-character passwords; backend validation requires at least 8 characters.
-- Frontend post IDs are strings like `p1`; backend post IDs will be MongoDB object IDs.
-- Frontend `coverImage` is a string URL; backend `coverImage` is an object with `url` and `publicId`.
-- Frontend supports `draft` and `published` statuses; backend `Post` currently supports `published` and `archived`, while drafts live in a separate `Draft` collection.
-- Frontend `User` includes `isProfileComplete`; backend users currently do not expose that field.
-
-### Styling and UI Conventions
-
-- Global design tokens are defined in `src/styles.css`.
-- Light and dark theme values are CSS variables.
-- Font loading is configured in the root route.
-- UI primitives live in `src/components/ui`.
-- Component imports use the `@/` alias.
-- Cards, dialogs, inputs, buttons, tabs, tooltips, dropdowns, and other primitives follow the local shadcn-style component structure.
-
-### Code Quality
-
-- Run `npm run lint` from the repository root before opening a pull request.
-- Run `npm run format` to apply Prettier formatting.
-- No automated test suite is currently configured.
-- Backend request validation is handled with Zod.
-- Backend environment validation happens at startup.
-
-## Deployment Notes
+### Environment Variables
+
+Backend variables are defined in `backend/.env.example`.
+
+| Variable | Purpose |
+| --- | --- |
+| `NODE_ENV` | Runtime environment: `development`, `test`, or `production`. |
+| `PORT` | Backend API port. Defaults to `5000`. |
+| `MONGO_URI` | MongoDB connection string. |
+| `CORS_ORIGIN` | Allowed frontend origin, for example `http://localhost:5173`. |
+| `JWT_SECRET` | Secret used to sign access tokens. Must be at least 32 characters. |
+| `JWT_EXPIRES_IN` | Access token lifetime, for example `7d`. |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name for image uploads. |
+| `CLOUDINARY_API_KEY` | Cloudinary API key. |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret. |
+
+## API Overview
+
+The API is mounted under `/api` and returns JSON responses using a consistent success/data envelope.
+
+| Method | Endpoint | Description | Auth |
+| --- | --- | --- | --- |
+| `GET` | `/health` | API health check. | No |
+| `POST` | `/auth/signup` | Create an account. | No |
+| `POST` | `/auth/login` | Authenticate a user. | No |
+| `GET` | `/auth/me` | Return the current user. | Yes |
+| `GET` | `/posts` | List published posts with pagination and filters. | Optional |
+| `GET` | `/posts/:id` | Get a post by ID or slug. | Optional |
+| `POST` | `/posts` | Publish a new post. | Yes |
+| `PATCH` | `/posts/:id` | Update an owned post. | Yes |
+| `DELETE` | `/posts/:id` | Delete an owned post. | Yes |
+| `POST` | `/posts/:id/like` | Like a post. | Yes |
+| `DELETE` | `/posts/:id/like` | Unlike a post. | Yes |
+| `GET` | `/drafts` | List the current user's drafts. | Yes |
+| `POST` | `/drafts` | Save a draft. | Yes |
+| `PATCH` | `/drafts/:id` | Update an owned draft. | Yes |
+| `DELETE` | `/drafts/:id` | Delete an owned draft. | Yes |
+| `POST` | `/drafts/:id/publish` | Publish a draft as a post. | Yes |
+| `GET` | `/users/:username` | Get a public writer profile. | Optional |
+| `PATCH` | `/users/me` | Update the current user's profile. | Yes |
+| `POST` | `/users/:id/follow` | Follow a writer. | Yes |
+| `DELETE` | `/users/:id/follow` | Unfollow a writer. | Yes |
+| `POST` | `/uploads/image` | Upload an image. | Yes |
+
+## Deployment
 
 ### Frontend
 
-The frontend is configured with `@lovable.dev/vite-tanstack-config`, which already includes the core plugins needed for TanStack Start, React, Tailwind CSS, path aliases, and Cloudflare build support.
+Build the frontend from the repository root:
 
-`wrangler.jsonc` points Cloudflare Workers to:
-
-```text
-@tanstack/react-start/server-entry
+```bash
+npm run build
 ```
 
-It also enables:
-
-```json
-{
-  "compatibility_flags": ["nodejs_compat"]
-}
-```
-
-Before deploying, update the worker name in `wrangler.jsonc` if needed:
-
-```json
-{
-  "name": "tanstack-start-app"
-}
-```
+Deploy the built frontend to a modern frontend hosting provider. Configure `VITE_API_URL` with the production API URL before building.
 
 ### Backend
 
-The backend can be deployed to any Node.js host that supports:
+Deploy the backend as a Node.js service from the `backend/` directory:
 
-- Node.js
-- MongoDB connectivity
-- Environment variables
-- Long-running HTTP processes
-
-Recommended production considerations:
-
-- Use a strong `JWT_SECRET`.
-- Restrict `CORS_ORIGIN` to trusted frontend domains.
-- Use a managed MongoDB provider or secure production MongoDB instance.
-- Configure Cloudinary credentials only when upload routes are active.
-- Run the backend behind HTTPS.
-- Add production logging and monitoring.
-
-## Roadmap
-
-Recommended next implementation steps:
-
-1. Replace the frontend mock API with an HTTP client pointed at the Express backend.
-2. Align frontend auth forms with backend signup and password validation requirements.
-3. Wire `GET /api/posts` to the existing published-post controller/service.
-4. Add authenticated post creation, update, delete, like, and unlike endpoints.
-5. Add draft CRUD routes backed by the `Draft` model.
-6. Add public profile routes backed by the `User`, `Post`, `Follow`, and `Like` models.
-7. Add follow/unfollow routes and count updates.
-8. Activate Cloudinary upload routes for cover images and inline editor images.
-9. Add automated tests for auth, validation, post workflows, and frontend critical paths.
-10. Add API client error handling, loading states, and token refresh or logout behavior.
-
-## Troubleshooting
-
-### Backend Fails on Startup with Invalid Environment Configuration
-
-Check `backend/.env`.
-
-Common causes:
-
-- `MONGO_URI` is missing.
-- `JWT_SECRET` is shorter than 32 characters.
-- `NODE_ENV` is not one of `development`, `test`, or `production`.
-- `PORT` is not a positive number.
-
-### Backend Cannot Connect to MongoDB
-
-Confirm MongoDB is running and that `MONGO_URI` is correct.
-
-For the default local configuration, the backend expects:
-
-```text
-mongodb://127.0.0.1:27017/blogspace
+```bash
+npm start
 ```
 
-### Frontend Does Not Reflect Backend Changes
+Required production configuration:
 
-This is expected in the current project state. The frontend reads from the mock service in `src/services/api.ts`, not the Express API.
+- `MONGO_URI` points to a MongoDB Atlas cluster.
+- `JWT_SECRET` is a strong production secret.
+- `CORS_ORIGIN` is restricted to the deployed frontend domain.
+- Cloudinary variables are configured when image uploads are enabled.
 
-### Created Posts Disappear After Reload
+## Future Enhancements
 
-This is expected while the frontend uses the in-memory mock service. Created posts, drafts, likes, and follows are not persisted to MongoDB yet.
-
-### Auth Works in the UI but Not Against the Backend
-
-The UI auth flow is currently mocked. Backend auth requires a fuller signup payload and enforces an 8-character minimum password.
-
-### CORS Errors When Calling the Backend
-
-Update `backend/.env`:
-
-```text
-CORS_ORIGIN=http://localhost:5173
-```
-
-If the frontend runs on a different port, add that origin instead. Multiple origins can be comma-separated.
-
-## Contributing
-
-1. Create a focused branch for your change.
-2. Keep frontend and backend behavior aligned when touching shared product flows.
-3. Prefer existing component and service patterns before adding new abstractions.
-4. Run linting and formatting before submitting changes.
-5. Document new environment variables, scripts, and API endpoints in this README.
+- Add automated unit, integration, and end-to-end test coverage.
+- Add GitHub Actions for linting, builds, and backend checks.
+- Add editor autosave and revision history.
+- Add comments, bookmarks, and reading lists.
+- Add profile settings for account and notification preferences.
+- Add analytics for author dashboards and post performance.
+- Add OpenAPI documentation for the REST API.
 
 ## License
 
-MIT
+BlogSpace is released under the [MIT License](LICENSE).
+
+## Author
+
+Created and maintained by **Pratham Mishra**.
