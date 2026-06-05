@@ -22,8 +22,8 @@ function ProfilePage() {
   const { data, loading, error, refetch } = useProfile(id);
   const { user } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
-  // id param is now the username; compare against the logged-in user's username.
-  const isMe = !!(user?.username && user.username === id) || user?.id === id;
+  // id param is the username; compare against the logged-in user's username.
+  const isMe = user?.username === id;
   const drafts = useDrafts();
 
   if (loading) {

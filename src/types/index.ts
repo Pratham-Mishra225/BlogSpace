@@ -6,7 +6,7 @@ export interface User {
   name: string;
   avatar: string;
   bio: string;
-  username?: string;
+  username: string;
   isProfileComplete?: boolean;
   /** JWT access token — present only on login/signup responses */
   token?: string;
