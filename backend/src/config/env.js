@@ -12,7 +12,11 @@ const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(5000),
   MONGO_URI: z.string().min(1, "MONGO_URI is required"),
-  CORS_ORIGIN: z.string().default("*"),
+  CORS_ORIGIN: z.string().default(""),
+  CORS_CREDENTIALS: z
+    .enum(["true", "false"])
+    .default("false")
+    .transform((value) => value === "true"),
   JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
   JWT_EXPIRES_IN: z.string().default("7d"),
   CLOUDINARY_CLOUD_NAME: z.string().optional().default(""),

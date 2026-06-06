@@ -32,6 +32,10 @@ Copy-Item .env.example .env
 
 The API will start on `http://localhost:5000` unless `PORT` is changed in `.env`.
 
+`CORS_ORIGIN` accepts comma-separated origins and wildcard patterns such as
+`https://blog-space225.vercel.app,https://*.vercel.app,http://localhost:5173`.
+Keep `CORS_CREDENTIALS=false` unless browser cookie credentials are required.
+
 ## Scripts
 
 ```bash

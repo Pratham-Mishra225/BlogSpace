@@ -188,7 +188,8 @@ Backend variables are defined in `backend/.env.example`.
 | `NODE_ENV` | Runtime environment: `development`, `test`, or `production`. |
 | `PORT` | Backend API port. Defaults to `5000`. |
 | `MONGO_URI` | MongoDB connection string. |
-| `CORS_ORIGIN` | Allowed frontend origin, for example `http://localhost:5173`. |
+| `CORS_ORIGIN` | Optional comma-separated extra allowed frontend origins or wildcard patterns. The API always allows the production Vercel app, Vercel preview domains, and localhost development origins. |
+| `CORS_CREDENTIALS` | Set to `true` only if browser clients need cookie-style credentials. Bearer-token auth works with the default `false`. |
 | `JWT_SECRET` | Secret used to sign access tokens. Must be at least 32 characters. |
 | `JWT_EXPIRES_IN` | Access token lifetime, for example `7d`. |
 | `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name for image uploads. |
@@ -247,7 +248,8 @@ Required production configuration:
 
 - `MONGO_URI` points to a MongoDB Atlas cluster.
 - `JWT_SECRET` is a strong production secret.
-- `CORS_ORIGIN` is restricted to the deployed frontend domain.
+- `CORS_ORIGIN` includes the production frontend and preview pattern, for example `https://blog-space225.vercel.app,https://*.vercel.app`.
+- `CORS_CREDENTIALS` remains `false` unless browser cookie credentials are intentionally introduced.
 - Cloudinary variables are configured when image uploads are enabled.
 
 ## Future Enhancements
