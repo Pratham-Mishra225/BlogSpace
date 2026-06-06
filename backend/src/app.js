@@ -39,6 +39,13 @@ app.get("/api", (_req, res) => {
   });
 });
 
+app.get("/", (_req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "BlogSpace API is running"
+  });
+});
+
 app.get("/api/health", (_req, res) => {
   res.status(200).json({
     success: true,
