@@ -5,7 +5,7 @@
  * Every exported function preserves its original signature so that all consumers
  * (hooks, store, components) need no signature changes.
  *
- * Backend base URL: VITE_API_URL (defaults to http://localhost:5000/api via api-client.ts)
+ * Backend base URL: VITE_API_URL (required - configured via api-client.ts)
  */
 
 import { apiClient } from "@/lib/api-client";

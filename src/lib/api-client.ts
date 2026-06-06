@@ -1,18 +1,24 @@
 /**
  * Centralized Axios instance for all BlogSpace API calls.
  *
- * - Base URL: VITE_API_URL env var (falls back to http://localhost:5000/api)
+ * - Base URL: VITE_API_URL env var (required - no fallback)
  * - Request interceptor: attaches Bearer token from localStorage (Zustand persist key)
  * - Response interceptor: unwraps the { success, data } envelope and normalises errors
  */
 
 import axios, { type AxiosError } from "axios";
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:5000/api";
+const BASE_URL = import.meta.env.VITE_API_URL;
+
+if (!BASE_URL) {
+  throw new Error(
+    "VITE_API_URL environment variable is not set. Please set it to your backend API URL (e.g., https://blogspace-s6vo.onrender.com/api)"
+  );
+}
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true,
+  withCredentials: false,
   headers: { "Content-Type": "application/json" },
 });
 

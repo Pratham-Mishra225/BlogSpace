@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-import cookieParser from "cookie-parser";
 import { env, isProduction } from "./config/env.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.middleware.js";
 import authRoutes from "./routes/auth.routes.js";
@@ -22,15 +21,12 @@ app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(
   cors({
     origin: corsOrigins.includes("*") ? "*" : corsOrigins,
-    credentials: !corsOrigins.includes("*"),
+    credentials: false,
   })
 );
 app.use(morgan(isProduction ? "combined" : "dev"));
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
-// Pass the JWT secret as the cookie-parser secret so req.signedCookies works
-// when the auth layer sets HttpOnly signed cookies.
-app.use(cookieParser(env.JWT_SECRET));
 
 app.get("/api", (_req, res) => {
   res.status(200).json({
