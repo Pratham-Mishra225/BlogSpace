@@ -107,6 +107,9 @@ export function Navbar() {
                   >
                     Profile
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate({ to: "/onboarding" })}>
+                    Edit profile
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate({ to: "/editor" })}>
                     Write a story
                   </DropdownMenuItem>

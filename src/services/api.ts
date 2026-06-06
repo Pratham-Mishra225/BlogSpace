@@ -51,7 +51,9 @@ const mapUser = (raw: Record<string, unknown>): User => ({
   username: raw.username as string,
   avatar: (raw.avatar as string) ?? "",
   bio: (raw.bio as string) ?? "",
-  isProfileComplete: !!(raw.username),
+  // Read the authoritative DB field; fall back to false for author objects
+  // embedded in posts (which never carry this field).
+  isProfileComplete: (raw.isProfileComplete as boolean) ?? false,
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

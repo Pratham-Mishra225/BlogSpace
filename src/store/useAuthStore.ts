@@ -67,7 +67,8 @@ export const useAuthStore = create<AuthState>()(
         if (!token) return;
         try {
           const user = await getMe();
-          set({ user: { ...user, isProfileComplete: !!user.username } });
+          // mapUser() already reads isProfileComplete from the DB response.
+          set({ user });
           _setCurrentUserId(user.id);
         } catch {
           // Token is expired / invalid — clear state so the user sees the login prompt.

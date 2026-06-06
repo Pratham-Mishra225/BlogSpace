@@ -59,6 +59,10 @@ const userSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
+    isProfileComplete: {
+      type: Boolean,
+      default: false,
+    },
     role: {
       type: String,
       enum: ["user", "admin"],

@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { PageTransition } from "@/components/PageTransition";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,15 +9,18 @@ import { useAuth } from "@/hooks/useAuth";
 import { useDebounce } from "@/hooks/useDebounce";
 import { checkUsernameAvailability } from "@/services/api";
 import { toast } from "sonner";
-import { Check, X, Loader2 } from "lucide-react";
+import { Check, X, Loader2, ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/onboarding")({
   component: OnboardingPage,
 });
 
 function OnboardingPage() {
-  const { user, isAuthenticated, saveProfile } = useAuth();
+  const { user, isAuthenticated, isProfileComplete, saveProfile } = useAuth();
   const navigate = useNavigate();
+
+  // Detect whether the user is editing an existing profile or setting up for the first time.
+  const isEditMode = isProfileComplete;
 
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
@@ -29,6 +32,14 @@ function OnboardingPage() {
   const [checking, setChecking] = useState(false);
   const debouncedUsername = useDebounce(username, 400);
 
+  /**
+   * Track the username the user had when they opened the page.
+   * The availability checker must skip the network call when the value
+   * hasn't changed — otherwise the user can never re-save their own username.
+   */
+  const originalUsernameRef = useRef<string>("");
+
+  // Redirect unauthenticated visitors; pre-fill existing values.
   useEffect(() => {
     if (!isAuthenticated) {
       navigate({ to: "/" });
@@ -37,15 +48,26 @@ function OnboardingPage() {
       setUsername(user.username ?? "");
       setBio(user.bio ?? "");
       setAvatar(user.avatar ?? "");
+      originalUsernameRef.current = user.username ?? "";
     }
   }, [isAuthenticated, user, navigate]);
 
+  // Username availability check — skipped when the value is unchanged.
   useEffect(() => {
     const u = debouncedUsername.trim();
+
+    // Reset indicator when too short.
     if (u.length < 3) {
       setAvailable(null);
       return;
     }
+
+    // Skip the network check if the user hasn't changed their username.
+    if (u === originalUsernameRef.current) {
+      setAvailable(null); // neutral state — no indicator needed
+      return;
+    }
+
     setChecking(true);
     checkUsernameAvailability(u)
       .then((r) => setAvailable(r.available))
@@ -55,14 +77,19 @@ function OnboardingPage() {
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
+
     if (!fullName.trim() || username.trim().length < 3) {
       toast.error("Add your name and a valid username.");
       return;
     }
-    if (available === false) {
+
+    // Only block if the username has changed AND it's taken.
+    const usernameChanged = username.trim() !== originalUsernameRef.current;
+    if (usernameChanged && available === false) {
       toast.error("That username is taken.");
       return;
     }
+
     setPending(true);
     try {
       await saveProfile({
@@ -71,7 +98,7 @@ function OnboardingPage() {
         bio: bio.trim(),
         avatar: avatar.trim(),
       });
-      toast.success("Profile updated");
+      toast.success(isEditMode ? "Profile updated" : "Profile created — welcome!");
       navigate({ to: "/" });
     } catch (err) {
       toast.error((err as Error).message);
@@ -87,17 +114,32 @@ function OnboardingPage() {
   return (
     <PageTransition>
       <div className="mx-auto max-w-2xl px-6 py-16">
+        {/* Back button — only in edit mode */}
+        {isEditMode && (
+          <button
+            type="button"
+            onClick={() => navigate({ to: "/profile/$id", params: { id: user?.username ?? "" } })}
+            className="mb-8 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to profile
+          </button>
+        )}
+
         <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          Welcome
+          {isEditMode ? "Your account" : "Welcome"}
         </p>
         <h1 className="mt-3 font-serif text-4xl text-foreground">
-          Set up your profile
+          {isEditMode ? "Edit your profile" : "Set up your profile"}
         </h1>
         <p className="mt-2 text-muted-foreground">
-          A few quick details so readers know who's writing.
+          {isEditMode
+            ? "Update your details below — changes are saved immediately."
+            : "A few quick details so readers know who's writing."}
         </p>
 
         <form onSubmit={submit} className="mt-10 space-y-8">
+          {/* Avatar preview + URL input */}
           <div className="flex items-center gap-6">
             <img
               src={previewAvatar}
@@ -112,9 +154,13 @@ function OnboardingPage() {
                 onChange={(e) => setAvatar(e.target.value)}
                 placeholder="https://…"
               />
+              <p className="text-xs text-muted-foreground">
+                Paste any public image URL. Leave blank to use an auto-generated avatar.
+              </p>
             </div>
           </div>
 
+          {/* Full name */}
           <div className="space-y-2">
             <Label htmlFor="name">Full name</Label>
             <Input
@@ -127,6 +173,7 @@ function OnboardingPage() {
             />
           </div>
 
+          {/* Username */}
           <div className="space-y-2">
             <Label htmlFor="username">Username</Label>
             <div className="relative">
@@ -156,6 +203,7 @@ function OnboardingPage() {
             </p>
           </div>
 
+          {/* Bio */}
           <div className="space-y-2">
             <Label htmlFor="bio">Bio</Label>
             <Textarea
@@ -171,15 +219,29 @@ function OnboardingPage() {
           </div>
 
           <div className="flex justify-end gap-3">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => navigate({ to: "/" })}
-            >
-              Skip for now
-            </Button>
+            {/* "Skip" only shown during first-time setup */}
+            {!isEditMode && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => navigate({ to: "/" })}
+              >
+                Skip for now
+              </Button>
+            )}
+            {isEditMode && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  navigate({ to: "/profile/$id", params: { id: user?.username ?? "" } })
+                }
+              >
+                Cancel
+              </Button>
+            )}
             <Button type="submit" disabled={pending}>
-              {pending ? "Saving…" : "Save profile"}
+              {pending ? "Saving…" : isEditMode ? "Save changes" : "Save profile"}
             </Button>
           </div>
         </form>

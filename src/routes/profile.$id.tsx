@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { FileText, FilePen } from "lucide-react";
+import { FileText, FilePen, Pencil } from "lucide-react";
 import { PageTransition } from "@/components/PageTransition";
 import { PostCard } from "@/components/PostCard";
 import { DraftCard } from "@/components/DraftCard";
@@ -123,7 +123,9 @@ function ProfilePage() {
                 </span>
               </div>
             </div>
-            {!isMe && (
+            {isMe ? (
+              <EditProfileButton />
+            ) : (
               <FollowButton
                 userId={data.user.id}
                 initialFollowing={data.isFollowing ?? false}
@@ -171,5 +173,20 @@ function ProfilePage() {
       </section>
       <AuthDialog open={authOpen} onOpenChange={setAuthOpen} />
     </PageTransition>
+  );
+}
+
+/** Shown on the user's own profile header — navigates to the shared edit-profile screen. */
+function EditProfileButton() {
+  const navigate = useNavigate();
+  return (
+    <button
+      type="button"
+      onClick={() => navigate({ to: "/onboarding" })}
+      className="flex shrink-0 items-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+    >
+      <Pencil className="h-4 w-4" strokeWidth={1.5} />
+      Edit profile
+    </button>
   );
 }

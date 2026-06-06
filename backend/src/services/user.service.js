@@ -49,6 +49,7 @@ export const userService = {
     }
 
     Object.assign(user, data);
+    user.isProfileComplete = true;
     await user.save();
     return user.toJSON();
   },
