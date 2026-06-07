@@ -12,7 +12,11 @@ interface Props {
   onDeleted?: () => void;
 }
 
-const stripHtml = (s: string) => s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+const stripHtml = (s: string) =>
+  s
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 
 export function PostCard({ post, canDelete, onDeleted }: Props) {
   const excerpt = post.format === "html" ? stripHtml(post.content) : post.content;
@@ -22,12 +26,7 @@ export function PostCard({ post, canDelete, onDeleted }: Props) {
       transition={{ type: "spring", stiffness: 260, damping: 22 }}
       className="group relative overflow-hidden rounded-lg border border-border bg-card shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
     >
-      <Link
-        to="/post/$id"
-        params={{ id: post.id }}
-        className="block"
-        aria-label={post.title}
-      >
+      <Link to="/post/$id" params={{ id: post.id }} className="block" aria-label={post.title}>
         <div className="aspect-[16/10] overflow-hidden bg-muted">
           {post.coverImage ? (
             <img
@@ -51,12 +50,8 @@ export function PostCard({ post, canDelete, onDeleted }: Props) {
               </span>
             ))}
           </div>
-          <h2 className="font-serif text-2xl leading-tight text-foreground">
-            {post.title}
-          </h2>
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            {truncate(excerpt, 140)}
-          </p>
+          <h2 className="font-serif text-2xl leading-tight text-foreground">{post.title}</h2>
+          <p className="text-sm leading-relaxed text-muted-foreground">{truncate(excerpt, 140)}</p>
           <div className="flex items-center gap-3 border-t border-border pt-4">
             {post.author.avatar ? (
               <img

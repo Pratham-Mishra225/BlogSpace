@@ -31,9 +31,7 @@ export function AuthorBio({ author, onAuthRequired }: Props) {
         >
           {author.name}
         </Link>
-        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-          {author.bio}
-        </p>
+        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{author.bio}</p>
       </div>
       <FollowButton userId={author.id} onAuthRequired={onAuthRequired} />
     </aside>

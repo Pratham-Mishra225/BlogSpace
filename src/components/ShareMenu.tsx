@@ -16,9 +16,7 @@ interface Props {
 
 export function ShareMenu({ postId, title, size = "md" }: Props) {
   const url =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/post/${postId}`
-      : `/post/${postId}`;
+    typeof window !== "undefined" ? `${window.location.origin}/post/${postId}` : `/post/${postId}`;
 
   const copyLink = async (e: Event) => {
     e.preventDefault();

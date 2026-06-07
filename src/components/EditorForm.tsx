@@ -92,11 +92,7 @@ export function EditorForm({ disabled }: Props) {
           >
             Save draft
           </Button>
-          <Button
-            type="submit"
-            onClick={(e) => submit(e, false)}
-            disabled={disabled || pending}
-          >
+          <Button type="submit" onClick={(e) => submit(e, false)} disabled={disabled || pending}>
             {pending ? "Publishing…" : "Publish"}
           </Button>
         </div>

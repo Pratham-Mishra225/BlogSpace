@@ -87,6 +87,6 @@ export const useAuthStore = create<AuthState>()(
       // Only persist user and token — actions are recreated each render.
       partialize: (state) => ({ user: state.user, token: state.token }),
       onRehydrateStorage: () => (state) => state?._hydrate(),
-    }
-  )
+    },
+  ),
 );

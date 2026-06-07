@@ -31,9 +31,7 @@ export function AuthDialog({ open, onOpenChange }: Props) {
     setPending(true);
     try {
       const user =
-        mode === "login"
-          ? await login({ email, password })
-          : await signup({ email, password });
+        mode === "login" ? await login({ email, password }) : await signup({ email, password });
       toast.success(mode === "login" ? "Welcome back" : "Welcome to BlogSpace");
       onOpenChange(false);
       setEmail("");
@@ -53,9 +51,7 @@ export function AuthDialog({ open, onOpenChange }: Props) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="font-serif text-2xl">BlogSpace</DialogTitle>
-          <DialogDescription>
-            Sign in to write, follow, and save stories.
-          </DialogDescription>
+          <DialogDescription>Sign in to write, follow, and save stories.</DialogDescription>
         </DialogHeader>
         <Tabs defaultValue="login" className="mt-2">
           <TabsList className="grid w-full grid-cols-2">
@@ -65,10 +61,7 @@ export function AuthDialog({ open, onOpenChange }: Props) {
 
           {(["login", "signup"] as const).map((mode) => (
             <TabsContent key={mode} value={mode}>
-              <form
-                onSubmit={(e) => handle(e, mode)}
-                className="space-y-4 pt-4"
-              >
+              <form onSubmit={(e) => handle(e, mode)} className="space-y-4 pt-4">
                 <div className="space-y-2">
                   <Label htmlFor={`${mode}-email`}>Email</Label>
                   <Input
@@ -93,11 +86,7 @@ export function AuthDialog({ open, onOpenChange }: Props) {
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={pending}>
-                  {pending
-                    ? "Please wait…"
-                    : mode === "login"
-                      ? "Sign in"
-                      : "Create account"}
+                  {pending ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
                 </Button>
               </form>
             </TabsContent>

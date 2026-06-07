@@ -38,8 +38,19 @@ const listQuery = z.object({
   }),
 });
 
+// Validator for the authenticated following-feed endpoint (page + limit only).
+const feedFollowingQuery = z.object({
+  body: z.object({}),
+  params: z.object({}),
+  query: z.object({
+    page: z.coerce.number().int().positive().optional().default(1),
+    limit: z.coerce.number().int().positive().max(50).optional().default(10),
+  }),
+});
+
 export const postValidators = {
   list: listQuery,
+  feedFollowing: feedFollowingQuery,
   idParam,
 
   create: z.object({

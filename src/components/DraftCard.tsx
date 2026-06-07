@@ -12,12 +12,7 @@ export function DraftCard({ post, onDeleted }: Props) {
     <article className="group relative flex gap-4 overflow-hidden rounded-lg border border-border bg-card p-4 shadow-[var(--shadow-card)]">
       {post.coverImage && (
         <div className="hidden h-24 w-32 shrink-0 overflow-hidden rounded-md bg-muted sm:block">
-          <img
-            src={post.coverImage}
-            alt=""
-            loading="lazy"
-            className="h-full w-full object-cover"
-          />
+          <img src={post.coverImage} alt="" loading="lazy" className="h-full w-full object-cover" />
         </div>
       )}
       <div className="flex flex-1 flex-col">

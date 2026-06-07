@@ -190,12 +190,8 @@ function OnboardingPage() {
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                 {checking && <Loader2 className="h-4 w-4 animate-spin" />}
-                {!checking && available === true && (
-                  <Check className="h-4 w-4 text-emerald-500" />
-                )}
-                {!checking && available === false && (
-                  <X className="h-4 w-4 text-destructive" />
-                )}
+                {!checking && available === true && <Check className="h-4 w-4 text-emerald-500" />}
+                {!checking && available === false && <X className="h-4 w-4 text-destructive" />}
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
@@ -213,19 +209,13 @@ function OnboardingPage() {
               placeholder="A sentence or two about what you write."
               rows={3}
             />
-            <p className="text-right text-xs text-muted-foreground">
-              {bio.length}/160
-            </p>
+            <p className="text-right text-xs text-muted-foreground">{bio.length}/160</p>
           </div>
 
           <div className="flex justify-end gap-3">
             {/* "Skip" only shown during first-time setup */}
             {!isEditMode && (
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => navigate({ to: "/" })}
-              >
+              <Button type="button" variant="ghost" onClick={() => navigate({ to: "/" })}>
                 Skip for now
               </Button>
             )}

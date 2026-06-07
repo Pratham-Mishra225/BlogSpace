@@ -10,12 +10,12 @@ const rootElement = document.getElementById("root");
 
 if (!rootElement) {
   throw new Error(
-    "Root element #root not found. Check that index.html contains <div id='root'></div>."
+    "Root element #root not found. Check that index.html contains <div id='root'></div>.",
   );
 }
 
 ReactDOM.createRoot(rootElement).render(
   <StrictMode>
     <RouterProvider router={router} />
-  </StrictMode>
+  </StrictMode>,
 );

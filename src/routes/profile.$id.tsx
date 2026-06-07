@@ -73,12 +73,7 @@ function ProfilePage() {
     ) : (
       <div className="grid gap-8 sm:grid-cols-2">
         {data.posts.map((p) => (
-          <PostCard
-            key={p.id}
-            post={p}
-            canDelete={isMe}
-            onDeleted={handlePostDeleted}
-          />
+          <PostCard key={p.id} post={p} canDelete={isMe} onDeleted={handlePostDeleted} />
         ))}
       </div>
     );
@@ -104,21 +99,15 @@ function ProfilePage() {
               <p className="mt-2 max-w-xl text-muted-foreground">{data.user.bio}</p>
               <div className="mt-4 flex gap-6 text-sm">
                 <span>
-                  <span className="font-semibold text-foreground">
-                    {data.followersCount}
-                  </span>{" "}
+                  <span className="font-semibold text-foreground">{data.followersCount}</span>{" "}
                   <span className="text-muted-foreground">followers</span>
                 </span>
                 <span>
-                  <span className="font-semibold text-foreground">
-                    {data.followingCount}
-                  </span>{" "}
+                  <span className="font-semibold text-foreground">{data.followingCount}</span>{" "}
                   <span className="text-muted-foreground">following</span>
                 </span>
                 <span>
-                  <span className="font-semibold text-foreground">
-                    {data.posts.length}
-                  </span>{" "}
+                  <span className="font-semibold text-foreground">{data.posts.length}</span>{" "}
                   <span className="text-muted-foreground">stories</span>
                 </span>
               </div>

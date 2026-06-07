@@ -39,10 +39,7 @@ export function Navbar() {
     <>
       <header className="glass sticky top-0 z-40 border-b border-border">
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-6">
-          <Link
-            to="/"
-            className="font-serif text-2xl font-semibold tracking-tight text-foreground"
-          >
+          <Link to="/" className="font-serif text-2xl font-semibold tracking-tight text-foreground">
             BlogSpace
           </Link>
 

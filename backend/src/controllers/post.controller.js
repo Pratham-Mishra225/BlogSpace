@@ -10,6 +10,13 @@ export const postController = {
     res.status(200).json({ success: true, data: result });
   }),
 
+  /** GET /api/posts/feed/following — requires authentication */
+  listFollowing: asyncHandler(async (req, res) => {
+    const { page, limit } = req.validated.query;
+    const result = await postService.listFollowing({ page, limit }, req.user._id);
+    res.status(200).json({ success: true, data: result });
+  }),
+
   /** GET /api/posts/:id */
   getById: asyncHandler(async (req, res) => {
     const { id } = req.validated.params;

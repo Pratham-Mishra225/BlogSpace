@@ -6,6 +6,9 @@ export const formatDate = (iso: string): string =>
   });
 
 export const truncate = (text: string, max = 160): string => {
-  const stripped = text.replace(/[#>*`_~\-]/g, "").replace(/\s+/g, " ").trim();
+  const stripped = text
+    .replace(/[#>*`_~\-]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
   return stripped.length > max ? `${stripped.slice(0, max).trimEnd()}…` : stripped;
 };

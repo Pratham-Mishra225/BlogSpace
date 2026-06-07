@@ -39,15 +39,12 @@ function HomePage() {
     <PageTransition>
       <section className="border-b border-border">
         <div className="mx-auto max-w-6xl px-6 py-16 sm:py-24">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            BlogSpace
-          </p>
+          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">BlogSpace</p>
           <h1 className="mt-3 max-w-3xl font-serif text-4xl leading-tight text-foreground sm:text-6xl">
             Stories worth your time, written slowly.
           </h1>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            A quiet corner of the internet for essays, field notes, and
-            long-form thinking.
+            A quiet corner of the internet for essays, field notes, and long-form thinking.
           </p>
         </div>
       </section>
@@ -108,7 +105,6 @@ function HomePage() {
           />
         )}
       </section>
-
     </PageTransition>
   );
 }

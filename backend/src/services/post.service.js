@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Post } from "../models/Post.js";
 import { Like } from "../models/Like.js";
+import { Follow } from "../models/Follow.js";
 import { User } from "../models/User.js";
 import { ApiError } from "../middleware/error.middleware.js";
 
@@ -81,6 +82,52 @@ export const postService = {
     ]);
 
     const decorated = await decoratePosts(posts, userId);
+    return { posts: decorated, ...buildPagination(total, page, limit) };
+  },
+
+  /**
+   * Returns a paginated feed of published posts written by authors the
+   * current user follows.
+   *
+   * Query strategy (2 DB round-trips + 1 batched like-decoration):
+   *   1. Follow.find({ follower }) → array of following ObjectIds (lean, indexed).
+   *   2. Post.find({ author: { $in: followingIds } }) → paginated results.
+   *   3. decoratePosts() → single Like query for the entire page.
+   *
+   * Returns an empty page immediately when the user follows nobody.
+   */
+  async listFollowing({ page = 1, limit = 10 } = {}, currentUserId) {
+    if (!currentUserId) {
+      throw new ApiError(401, "Authentication required");
+    }
+
+    // Step 1: Fetch all author IDs the current user follows (lean = plain JS, faster).
+    const followDocs = await Follow.find({ follower: currentUserId })
+      .select("following")
+      .lean();
+
+    const followingIds = followDocs.map((f) => f.following);
+
+    // No follows → return an empty page without touching the Posts collection.
+    if (followingIds.length === 0) {
+      return { posts: [], ...buildPagination(0, page, limit) };
+    }
+
+    // Step 2: Fetch paginated posts from followed authors only.
+    const filter = { status: "published", author: { $in: followingIds } };
+    const skip = (page - 1) * limit;
+
+    const [posts, total] = await Promise.all([
+      Post.find(filter)
+        .sort({ publishedAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate("author", AUTHOR_SELECT),
+      Post.countDocuments(filter),
+    ]);
+
+    // Step 3: Batch-decorate with like status.
+    const decorated = await decoratePosts(posts, currentUserId);
     return { posts: decorated, ...buildPagination(total, page, limit) };
   },
 

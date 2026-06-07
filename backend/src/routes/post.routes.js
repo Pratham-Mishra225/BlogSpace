@@ -9,6 +9,15 @@ const router = Router();
 
 // ── Public routes (like status resolved for authenticated viewers) ─────────────
 router.get("/", optionalAuth, validate(postValidators.list), postController.list);
+
+// ── Following feed (must be declared BEFORE /:id to prevent "feed" matching as a post id) ──
+router.get(
+  "/feed/following",
+  requireAuth,
+  validate(postValidators.feedFollowing),
+  postController.listFollowing
+);
+
 router.get("/:id", optionalAuth, validate(postValidators.idParam), postController.getById);
 
 // ── Authenticated routes ───────────────────────────────────────────────────────

@@ -33,7 +33,7 @@ const mapPost = (raw: Record<string, unknown>): Post => ({
   coverImage:
     typeof raw.coverImage === "object" && raw.coverImage !== null
       ? ((raw.coverImage as { url: string }).url ?? "")
-      : (raw.coverImage as string) ?? "",
+      : ((raw.coverImage as string) ?? ""),
   author: mapUser(raw.author as Record<string, unknown>),
   tags: (raw.tags as string[]) ?? [],
   createdAt: raw.createdAt as string,
@@ -63,7 +63,7 @@ const mapUser = (raw: Record<string, unknown>): User => ({
 export const login = async (data: AuthDTO): Promise<User & { token: string }> => {
   const res = await apiClient.post<{ success: boolean; data: Record<string, unknown> }>(
     "/auth/login",
-    data
+    data,
   );
   const payload = res.data.data;
   return {
@@ -81,7 +81,7 @@ export const signup = async (data: AuthDTO): Promise<User & { token: string }> =
       // The backend requires name; derive a sensible default from the email.
       name: data.email.split("@")[0] ?? "New Writer",
       username: `user_${Date.now()}`, // temporary; user will update on onboarding
-    }
+    },
   );
   const payload = res.data.data;
   return {
@@ -96,7 +96,7 @@ export const logout = async (): Promise<void> => {
 
 export const getMe = async (): Promise<User> => {
   const res = await apiClient.get<{ success: boolean; data: { user: Record<string, unknown> } }>(
-    "/auth/me"
+    "/auth/me",
   );
   return mapUser(res.data.data.user);
 };
@@ -113,15 +113,17 @@ export const getPosts = async (): Promise<Post[]> => {
   return res.data.data.posts.map(mapPost);
 };
 
-export const getFollowingPosts = async (): Promise<Post[]> => {
-  // The backend does not yet have a dedicated "following" feed endpoint.
-  // For now we fall back to the main feed; this will be wired up in Phase 2.
-  return getPosts();
+export const getFollowingPosts = async (page = 1, limit = 50): Promise<Post[]> => {
+  const res = await apiClient.get<{
+    success: boolean;
+    data: { posts: Record<string, unknown>[] };
+  }>("/posts/feed/following", { params: { page, limit } });
+  return res.data.data.posts.map(mapPost);
 };
 
 export const getPostById = async (id: string): Promise<Post> => {
   const res = await apiClient.get<{ success: boolean; data: Record<string, unknown> }>(
-    `/posts/${id}`
+    `/posts/${id}`,
   );
   return mapPost(res.data.data);
 };
@@ -132,36 +134,34 @@ export const getDraftPosts = async (): Promise<Post[]> => {
     data: { drafts: Record<string, unknown>[] };
   }>("/drafts");
   // Map Draft documents (which have the same shape as posts minus status)
-  return res.data.data.drafts.map((d) =>
-    mapPost({ ...d, status: "draft" })
-  );
+  return res.data.data.drafts.map((d) => mapPost({ ...d, status: "draft" }));
 };
 
 export const createPost = async (data: CreatePostDTO): Promise<Post> => {
-  const res = await apiClient.post<{ success: boolean; data: Record<string, unknown> }>(
-    "/posts",
-    {
-      title: data.title,
-      content: data.content,
-      excerpt: data.content.replace(/<[^>]+>/g, " ").trim().slice(0, 280),
-      coverImage: data.coverImage ? { url: data.coverImage, publicId: "" } : undefined,
-      tags: data.tags,
-    }
-  );
+  const res = await apiClient.post<{ success: boolean; data: Record<string, unknown> }>("/posts", {
+    title: data.title,
+    content: data.content,
+    excerpt: data.content
+      .replace(/<[^>]+>/g, " ")
+      .trim()
+      .slice(0, 280),
+    coverImage: data.coverImage ? { url: data.coverImage, publicId: "" } : undefined,
+    tags: data.tags,
+  });
   return mapPost(res.data.data);
 };
 
 export const saveDraft = async (data: CreatePostDTO): Promise<Post> => {
-  const res = await apiClient.post<{ success: boolean; data: Record<string, unknown> }>(
-    "/drafts",
-    {
-      title: data.title || "Untitled draft",
-      content: data.content,
-      excerpt: data.content.replace(/<[^>]+>/g, " ").trim().slice(0, 280),
-      coverImage: data.coverImage ? { url: data.coverImage, publicId: "" } : undefined,
-      tags: data.tags,
-    }
-  );
+  const res = await apiClient.post<{ success: boolean; data: Record<string, unknown> }>("/drafts", {
+    title: data.title || "Untitled draft",
+    content: data.content,
+    excerpt: data.content
+      .replace(/<[^>]+>/g, " ")
+      .trim()
+      .slice(0, 280),
+    coverImage: data.coverImage ? { url: data.coverImage, publicId: "" } : undefined,
+    tags: data.tags,
+  });
   return mapPost({ ...res.data.data, status: "draft" });
 };
 
@@ -175,7 +175,7 @@ export const updatePost = async (data: UpdatePostDTO): Promise<Post> => {
         coverImage: { url: data.coverImage, publicId: "" },
       }),
       ...(data.tags !== undefined && { tags: data.tags }),
-    }
+    },
   );
   return mapPost(res.data.data);
 };
@@ -195,9 +195,7 @@ export const deletePost = async (id: string): Promise<{ id: string }> => {
 // LIKES
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const likePost = async (
-  postId: string
-): Promise<{ likeCount: number; isLiked: true }> => {
+export const likePost = async (postId: string): Promise<{ likeCount: number; isLiked: true }> => {
   const res = await apiClient.post<{
     success: boolean;
     data: { likeCount: number; isLiked: true };
@@ -206,7 +204,7 @@ export const likePost = async (
 };
 
 export const unlikePost = async (
-  postId: string
+  postId: string,
 ): Promise<{ likeCount: number; isLiked: false }> => {
   const res = await apiClient.delete<{
     success: boolean;
@@ -221,14 +219,14 @@ export const unlikePost = async (
 
 export const followUser = async (userId: string): Promise<{ following: true }> => {
   const res = await apiClient.post<{ success: boolean; data: { following: true } }>(
-    `/users/${userId}/follow`
+    `/users/${userId}/follow`,
   );
   return res.data.data;
 };
 
 export const unfollowUser = async (userId: string): Promise<{ following: false }> => {
   const res = await apiClient.delete<{ success: boolean; data: { following: false } }>(
-    `/users/${userId}/follow`
+    `/users/${userId}/follow`,
   );
   return res.data.data;
 };
@@ -240,7 +238,7 @@ export const unfollowUser = async (userId: string): Promise<{ following: false }
  */
 export const toggleFollow = async (
   userId: string,
-  currentlyFollowing: boolean
+  currentlyFollowing: boolean,
 ): Promise<{ following: boolean }> => {
   return currentlyFollowing ? unfollowUser(userId) : followUser(userId);
 };
@@ -280,7 +278,7 @@ export const getProfile = async (username: string): Promise<Profile> => {
 };
 
 export const checkUsernameAvailability = async (
-  username: string
+  username: string,
 ): Promise<{ available: boolean }> => {
   try {
     // Try fetching the profile; if 404 → username is available.
@@ -305,7 +303,7 @@ export const updateProfile = async (data: ProfileSetupDTO): Promise<User> => {
       username: data.username.trim().toLowerCase(),
       bio: data.bio.trim(),
       ...(data.avatar.trim() && { avatar: data.avatar.trim() }),
-    }
+    },
   );
   return mapUser(res.data.data.user);
 };

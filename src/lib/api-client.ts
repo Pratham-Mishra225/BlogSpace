@@ -12,7 +12,7 @@ const BASE_URL = import.meta.env.VITE_API_URL;
 
 if (!BASE_URL) {
   throw new Error(
-    "VITE_API_URL environment variable is not set. Please set it to your backend API URL (e.g., https://blogspace-s6vo.onrender.com/api)"
+    "VITE_API_URL environment variable is not set. Please set it to your backend API URL (e.g., https://blogspace-s6vo.onrender.com/api)",
   );
 }
 
@@ -44,9 +44,7 @@ apiClient.interceptors.response.use(
   (response) => response, // Pass through; callers unwrap .data themselves.
   (error: AxiosError<{ message?: string; details?: unknown[] }>) => {
     const message =
-      error.response?.data?.message ??
-      error.message ??
-      "An unexpected error occurred";
+      error.response?.data?.message ?? error.message ?? "An unexpected error occurred";
     return Promise.reject(new Error(message));
-  }
+  },
 );

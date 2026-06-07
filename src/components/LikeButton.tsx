@@ -77,11 +77,7 @@ export function LikeButton({
           transition={{ type: "spring", stiffness: 500, damping: 18 }}
           className="inline-flex"
         >
-          <Heart
-            size={iconSize}
-            strokeWidth={1.75}
-            className={liked ? "fill-rose-500" : ""}
-          />
+          <Heart size={iconSize} strokeWidth={1.75} className={liked ? "fill-rose-500" : ""} />
         </motion.span>
       </AnimatePresence>
       <span className="tabular-nums">{count}</span>

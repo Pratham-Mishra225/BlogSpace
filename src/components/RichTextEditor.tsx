@@ -48,8 +48,7 @@ export function RichTextEditor({ value, onChange, disabled, placeholder }: Props
     editable: !disabled,
     editorProps: {
       attributes: {
-        class:
-          "prose-editorial focus:outline-none min-h-[60vh] max-w-none",
+        class: "prose-editorial focus:outline-none min-h-[60vh] max-w-none",
       },
     },
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
@@ -110,46 +109,98 @@ function Toolbar({ editor, disabled }: { editor: Editor; disabled?: boolean }) {
 
   return (
     <div className="glass sticky top-16 z-20 -mx-2 flex flex-wrap items-center gap-1 rounded-lg border border-border px-2 py-1.5">
-      <Btn label="Bold" onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")}>
+      <Btn
+        label="Bold"
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        active={editor.isActive("bold")}
+      >
         <Bold className="h-4 w-4" strokeWidth={1.75} />
       </Btn>
-      <Btn label="Italic" onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")}>
+      <Btn
+        label="Italic"
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        active={editor.isActive("italic")}
+      >
         <Italic className="h-4 w-4" strokeWidth={1.75} />
       </Btn>
-      <Btn label="Underline" onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive("underline")}>
+      <Btn
+        label="Underline"
+        onClick={() => editor.chain().focus().toggleUnderline().run()}
+        active={editor.isActive("underline")}
+      >
         <UnderlineIcon className="h-4 w-4" strokeWidth={1.75} />
       </Btn>
       <Divider />
-      <Btn label="H1" onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} active={editor.isActive("heading", { level: 1 })}>
+      <Btn
+        label="H1"
+        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+        active={editor.isActive("heading", { level: 1 })}
+      >
         <Heading1 className="h-4 w-4" strokeWidth={1.75} />
       </Btn>
-      <Btn label="H2" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive("heading", { level: 2 })}>
+      <Btn
+        label="H2"
+        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+        active={editor.isActive("heading", { level: 2 })}
+      >
         <Heading2 className="h-4 w-4" strokeWidth={1.75} />
       </Btn>
-      <Btn label="H3" onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} active={editor.isActive("heading", { level: 3 })}>
+      <Btn
+        label="H3"
+        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+        active={editor.isActive("heading", { level: 3 })}
+      >
         <Heading3 className="h-4 w-4" strokeWidth={1.75} />
       </Btn>
       <Divider />
-      <Btn label="Bulleted list" onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive("bulletList")}>
+      <Btn
+        label="Bulleted list"
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        active={editor.isActive("bulletList")}
+      >
         <List className="h-4 w-4" strokeWidth={1.75} />
       </Btn>
-      <Btn label="Ordered list" onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive("orderedList")}>
+      <Btn
+        label="Ordered list"
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        active={editor.isActive("orderedList")}
+      >
         <ListOrdered className="h-4 w-4" strokeWidth={1.75} />
       </Btn>
-      <Btn label="Quote" onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive("blockquote")}>
+      <Btn
+        label="Quote"
+        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+        active={editor.isActive("blockquote")}
+      >
         <Quote className="h-4 w-4" strokeWidth={1.75} />
       </Btn>
-      <Btn label="Code block" onClick={() => editor.chain().focus().toggleCodeBlock().run()} active={editor.isActive("codeBlock")}>
+      <Btn
+        label="Code block"
+        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+        active={editor.isActive("codeBlock")}
+      >
         <Code2 className="h-4 w-4" strokeWidth={1.75} />
       </Btn>
       <Divider />
-      <Btn label="Align left" onClick={() => editor.chain().focus().setTextAlign("left").run()} active={editor.isActive({ textAlign: "left" })}>
+      <Btn
+        label="Align left"
+        onClick={() => editor.chain().focus().setTextAlign("left").run()}
+        active={editor.isActive({ textAlign: "left" })}
+      >
         <AlignLeft className="h-4 w-4" strokeWidth={1.75} />
       </Btn>
-      <Btn label="Align center" onClick={() => editor.chain().focus().setTextAlign("center").run()} active={editor.isActive({ textAlign: "center" })}>
+      <Btn
+        label="Align center"
+        onClick={() => editor.chain().focus().setTextAlign("center").run()}
+        active={editor.isActive({ textAlign: "center" })}
+      >
         <AlignCenter className="h-4 w-4" strokeWidth={1.75} />
       </Btn>
-      <Btn label="Align right" onClick={() => editor.chain().focus().setTextAlign("right").run()} active={editor.isActive({ textAlign: "right" })}>
+      <Btn
+        label="Align right"
+        onClick={() => editor.chain().focus().setTextAlign("right").run()}
+        active={editor.isActive({ textAlign: "right" })}
+      >
         <AlignRight className="h-4 w-4" strokeWidth={1.75} />
       </Btn>
       <Divider />
@@ -159,7 +210,10 @@ function Toolbar({ editor, disabled }: { editor: Editor; disabled?: boolean }) {
       <Btn label="Insert link" onClick={setLink} active={editor.isActive("link")}>
         <LinkIcon className="h-4 w-4" strokeWidth={1.75} />
       </Btn>
-      <Btn label="Horizontal divider" onClick={() => editor.chain().focus().setHorizontalRule().run()}>
+      <Btn
+        label="Horizontal divider"
+        onClick={() => editor.chain().focus().setHorizontalRule().run()}
+      >
         <Minus className="h-4 w-4" strokeWidth={1.75} />
       </Btn>
     </div>
